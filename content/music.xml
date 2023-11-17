@@ -1,0 +1,20 @@
+<music root="music/">
+
+	<!-- TRAUMATIZED -->
+
+	<track name="burningmemory" path="traumatized/BurningMemory.ogg" loop="true" />
+	<track name="happyburningmemory" intro="traumatized/happyBurningMemory intro.ogg" path="traumatized/happyBurningMemory loop.ogg" loop="true" />
+
+	<!-- SPECIALIST -->
+
+	<track name="specialist" path="specialist/arcadespecalist.ogg" loop="true" />
+	<track name="paincialist" path="specialist/crackhousespecialist.ogg" loop="true" />
+	
+	<!-- Sample custom music track (remove <!-- and - -> to enable it): -->
+	<!-- <track name="s_tisaac" path="custommusic/my_tainted_isaac_song.ogg" loop="true" /> -->
+	<!-- <track name="s_tisaac1" path="custommusic/my_different_tainted_isaac_song.ogg" loop="true" /> -->
+	
+	<!-- \/ place your own tracks below \/ -->
+	
+	
+</music>

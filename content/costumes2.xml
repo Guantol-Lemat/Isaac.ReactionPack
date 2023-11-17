@@ -1,0 +1,84 @@
+<costumes anm2root="gfx/characters/">
+
+	<!-- TRAUMATIZED -->
+
+	<costume anm2path="traumatized/isaactrauma.anm2" priority="900" type="none" hasSkinAlt="true"/>
+	<costume anm2path="traumatized/caintrauma.anm2" priority="900" type="none" hasSkinAlt="true"/>
+	<costume anm2path="traumatized/azazeltrauma.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/azazeltraumab.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/keepertraumab.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/bluebabytraumab.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/paintrauma.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/lilithtraumab.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/lazarus2traumab.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/jacobtraumab.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/jacob2traumab.anm2" priority="900" type="none"/>
+	<costume anm2path="traumatized/samsontraumab.anm2" priority="900" type="none"/>
+
+	<!-- UGH -->
+
+	<costume anm2path="ugh/isaacugh.anm2" priority="901" type="none" hasSkinAlt="true"/>
+	<costume anm2path="ugh/azazelugh.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/azazelughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/keeperughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/bluebabyughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/painugh.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/lilithughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/lazarus2ughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/jacobughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/jacob2ughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/samsonughb.anm2" priority="901" type="none"/>
+	<costume anm2path="ugh/thelostugh.anm2" priority="901" type="none"/>
+
+	<!-- DISAPPOINT -->
+
+	<costume anm2path = "disappointed/Disappointed_Animation.anm2" type = "none" hasSkinAlt = "true" priority = "902"/>
+    <costume anm2path = "disappointed/Disappointed_Animation_Azazel.anm2" type = "none" priority = "902"/>
+    <costume anm2path = "disappointed/Disappointed_Animation_BlueBabyB.anm2" type = "none" priority = "902"/>
+    <costume anm2path = "disappointed/Disappointed_Animation_AzazelB.anm2" type = "none" priority = "902"/>
+    <costume anm2path = "disappointed/Disappointed_Animation_LazarusB2.anm2" type = "none" priority = "902"/>
+    <costume anm2path = "disappointed/Disappointed_Animation_LilithB.anm2" type = "none" priority = "902"/>
+    <costume anm2path = "disappointed/Disappointed_Animation_KeeperB.anm2" type = "none" priority = "902"/>
+
+	<!-- POG -->
+
+	<costume anm2path="pog/isaacpog.anm2" priority="903" type="none" hasSkinAlt="true"/>
+	<costume anm2path="pog/azazelpog.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/azazelpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/keeperpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/bluebabypogb.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/painpog.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/lilithpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/lazarus2pogb.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/jacobpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/jacob2pogb.anm2" priority="903" type="none"/>
+	<costume anm2path="pog/samsonpogb.anm2" priority="903" type="none"/>
+	
+	<!-- SPECIALIST -->
+	
+	<costume anm2path="specialist/specialist_isaac.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_magdalene.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_cain.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_judas.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_dark_judas.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_xxx.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_eve.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_samson.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_azazer.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_lazarus.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_lazarus2.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_eden.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_lost.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_lilith.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_keeper.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_apollyon.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_forgor_bone.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_forgor_soul.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_bethany.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_jacob.anm2" isFlying="true" priority="904" type="none"/>
+	<costume anm2path="specialist/specialist_esau.anm2" isFlying="true" priority="904" type="none"/>
+	
+	<costume anm2path="specialist/specialist_t_cain.anm2" isFlying="true" priority="904" type="none"/>
+	
+	<costume anm2path="specialist/items/binky.anm2" isFlying="true" priority="904" type="none"/>
+</costumes>
