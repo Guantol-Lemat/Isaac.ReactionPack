@@ -1,3 +1,9 @@
+Epic.Default = "specialist"
+
+Epic.Music = {
+    [PlayerType.PLAYER_CAIN_B] = "paincialist"
+}
+
 Epic.SpecialistMusic = {
     [PlayerType.PLAYER_ISAAC] = "specialist",
     [PlayerType.PLAYER_MAGDALENE] = "specialist",
@@ -42,3 +48,5 @@ Epic.SpecialistMusic = {
     [PlayerType.PLAYER_JACOB2_B] = "specialist",
     [PlayerType.PLAYER_THESOUL_B] = "specialist" 
 }
+
+Epic:AddDanceMusicPack(Epic.Music, "Specialist", Epic.Default)

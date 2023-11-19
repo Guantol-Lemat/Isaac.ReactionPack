@@ -19,19 +19,27 @@ function Trauma:RemoveTraumaMusic()
 end
 
 local function ApplyTraumaCostume()
+    local costumeSet = ReactionPack.Settings.Trauma.CostumeSet
+    local packName = ReactionPack.CostumeSets[costumeSet].IDs[ReactionPack.Settings.Trauma.CostumePack]
     for playerNum = 0, Game():GetNumPlayers() do
         local player = Game():GetPlayer(playerNum)
-		local applyCostume = Trauma.TraumaCostumes[player:GetPlayerType()]["Apply"]
-		local removeCostume = Trauma.TraumaCostumes[player:GetPlayerType()]["Remove"]
+        local playerType = player:GetPlayerType()
+        local applyCostume = nil
+        local removeCostume = nil
+--		local applyCostume = Trauma.TraumaCostumes[player:GetPlayerType()]["Apply"]
+--		local removeCostume = Trauma.TraumaCostumes[player:GetPlayerType()]["Remove"]
+        if ReactionPack.CostumeSets[costumeSet][packName][playerType] == nil then
+            applyCostume = ReactionPack.CostumeSets[costumeSet][packName].Default.Apply
+            removeCostume = ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
+        else
+            applyCostume = ReactionPack.CostumeSets[costumeSet][packName][playerType].Apply or ReactionPack.CostumeSets[costumeSet][packName].Default.Apply
+            removeCostume = ReactionPack.CostumeSets[costumeSet][packName][playerType].Remove or ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
+        end
 
         if applyCostume then
             player:AddNullCostume(applyCostume)
             ReactionPack.AppliedCostumes[playerNum] = applyCostume
-        else
-            player:AddNullCostume(Trauma.TraumaCostumes[PlayerType.PLAYER_ISAAC]["Apply"])
-            ReactionPack.AppliedCostumes[playerNum] = Trauma.TraumaCostumes[PlayerType.PLAYER_ISAAC]["Apply"]
         end
-
         if removeCostume then
             player:TryRemoveNullCostume(removeCostume)
         end
@@ -39,15 +47,16 @@ local function ApplyTraumaCostume()
 end
 
 local function RemoveTraumaCostume()
+    local costumeSet = ReactionPack.Settings.Trauma.CostumeSet
+    local packName = ReactionPack.Settings.Trauma.CostumePack
     for playerNum = 0, Game():GetNumPlayers() do
         local player = Game():GetPlayer(playerNum)
-		local applyCostume = Trauma.TraumaCostumes[player:GetPlayerType()]["Remove"]
+--		local applyCostume = Trauma.TraumaCostumes[player:GetPlayerType()]["Remove"]
 		local removeCostume = ReactionPack.AppliedCostumes[playerNum]
 
         if applyCostume then
             player:AddNullCostume(applyCostume)
         end
-
         if removeCostume then
             player:TryRemoveNullCostume(removeCostume)
         end
