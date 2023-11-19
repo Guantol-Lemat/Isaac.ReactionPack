@@ -14,7 +14,7 @@ if ReactionPack:HasData() then
     ReactionPack.Settings.Reaction_1 = loadedData.Reaction_1 or ReactionPack.FunctionList.Ugh.Id
     ReactionPack.Settings.Reaction_2 = loadedData.Reaction_2 or ReactionPack.FunctionList.Disappoint.Id
     ReactionPack.Settings.Reaction_3 = loadedData.Reaction_3 or ReactionPack.FunctionList.Pog.Id
-    ReactionPack.Settings.Reaction_4 = loadedData.Reaction_4 or ReactionPack.FunctionList.Specialist.Id
+    ReactionPack.Settings.Reaction_4 = loadedData.Reaction_4 or ReactionPack.FunctionList.Dance.Id
     ReactionPack.Settings.Trauma.EnableMusic = loadedData.Trauma.EnableMusic == nil and true or loadedData.Trauma.EnableMusic
     ReactionPack.Settings.Specialist.EnableMusic = loadedData.Specialist.EnableMusic == nil and true or loadedData.Specialist.EnableMusic
 end

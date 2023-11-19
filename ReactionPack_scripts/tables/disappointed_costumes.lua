@@ -6,6 +6,17 @@ local function DisappointAnm(name)
     return Isaac.GetCostumeIdByPath("gfx/characters/disappointed/" .. name .. ".anm2");
 end
 
+Disappoint.Default = {["Apply"] = DisappointAnm("Disappointed_Animation"), ["Remove"] = nil}
+
+Disappoint.Costumes = {
+    [PlayerType.PLAYER_AZAZEL] = {["Apply"] = DisappointAnm("Disappointed_Animation_Azazel")},
+    [PlayerType.PLAYER_BLUEBABY_B] = {["Apply"] = DisappointAnm("Disappointed_Animation_BlueBabyB"), ["Remove"] = BaseAnm("character_b05_bluebaby")},
+    [PlayerType.PLAYER_AZAZEL_B] = {["Apply"] = DisappointAnm("Disappointed_Animation_AzazelB")},
+    [PlayerType.PLAYER_LILITH_B] = {["Apply"] = DisappointAnm("Disappointed_Animation_LilithB")},
+    [PlayerType.PLAYER_KEEPER_B] = {["Apply"] = DisappointAnm("Disappointed_Animation_KeeperB"), ["Remove"] = BaseAnm("character_b13_keeper")},
+    [PlayerType.PLAYER_LAZARUS2_B] = {["Apply"] = DisappointAnm("Disappointed_Animation_LazarusB2"), ["Remove"] = BaseAnm("character_b09_lazarus2")}
+}
+
 Disappoint.DisappointCostumes = {
     [PlayerType.PLAYER_ISAAC] = {["Apply"] = DisappointAnm("Disappointed_Animation"), ["Remove"] = nil},
     [PlayerType.PLAYER_MAGDALENE] = {["Apply"] = DisappointAnm("Disappointed_Animation"), ["Remove"] = nil},
@@ -50,3 +61,6 @@ Disappoint.DisappointCostumes = {
     [PlayerType.PLAYER_JACOB2_B] = {["Apply"] = DisappointAnm("Disappointed_Animation"), ["Remove"] = nil},
     [PlayerType.PLAYER_THESOUL_B] = {["Apply"] = DisappointAnm("Disappointed_Animation"), ["Remove"] = nil}
 }
+
+Trauma:AddTraumaCostumePack(Disappoint.Costumes, "Disappointed", Disappoint.Default)
+Disappoint:AddNeutralCostumePack(Disappoint.Costumes, "Disappointed", Disappoint.Default)

@@ -1,3 +1,9 @@
+Trauma.Default = "burningmemory"
+
+Trauma.Music = {
+    [PlayerType.PLAYER_CAIN_B] = "happyburningmemory"
+}
+
 Trauma.TraumaMusic = {
     [PlayerType.PLAYER_ISAAC] = "burningmemory",
     [PlayerType.PLAYER_MAGDALENE] = "burningmemory",
@@ -42,3 +48,5 @@ Trauma.TraumaMusic = {
     [PlayerType.PLAYER_JACOB2_B] = "burningmemory",
     [PlayerType.PLAYER_THESOUL_B] = "burningmemory" 
 }
+
+Trauma:AddTraumaMusicPack(Trauma.Music, "Traumatized", Trauma.Default)
