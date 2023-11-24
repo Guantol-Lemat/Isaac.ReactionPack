@@ -1,4 +1,4 @@
-local log = require("ReactionPack_scripts.functions.log")
+local log = require("reactionpack_scripts.functions.log")
 
 local function GetWarningString(FunctionName)
     return "[WARNING for " .. FunctionName " ] : this feature is not yet implement, hence nothing is going to happen"
