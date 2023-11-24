@@ -1,16 +1,20 @@
+local defaultSet = ReactionPack.Sets.Disabled
+local defaultPack = ReactionPack.Pack.DEFAULT
+local defaultSetData = {CostumeSet = defaultSet, CostumePack = defaultPack, MusicSet = defaultSet, MusicPack = defaultPack, SoundSet = defaultSet, SoundPack = defaultPack}
+
+
 ReactionPack.Settings = {
-    ModVersion = ReactionPack.ModVersion,
 	ReactInBattle = true,
     BlindBypass = false,
-    Reaction_Glitched = ReactionPack.Sets.Nothing,
-    Reaction_0 = ReactionPack.Sets.Nothing,
-    Reaction_1 = ReactionPack.Sets.Nothing,
-    Reaction_2 = ReactionPack.Sets.Nothing,
-    Reaction_3 = ReactionPack.Sets.Nothing,
-    Reaction_4 = ReactionPack.Sets.Nothing,
-    Trauma = {CostumeSet = ReactionPack.Sets.Nothing, CostumePack = nil, MusicSet = true},
-    Ugh = {CostumeSet = ReactionPack.Sets.Nothing, CostumePack = nil, MusicSet = true},
-    Neutral = {CostumeSet = ReactionPack.Sets.Nothing, CostumePack = nil, MusicSet = true},
-    Pog = {CostumeSet = ReactionPack.Sets.Nothing, CostumePack = nil, MusicSet = true},
-    Dance = {CostumeSet = ReactionPack.Sets.Nothing, CostumePack = nil, MusicSet = true}
+    Reaction_Glitched = defaultSet,
+    Reaction_0 = defaultSet,
+    Reaction_1 = defaultSet,
+    Reaction_2 = defaultSet,
+    Reaction_3 = defaultSet,
+    Reaction_4 = defaultSet,
+    Trauma = defaultSetData,
+    Ugh = defaultSetData,
+    Neutral = defaultSetData,
+    Pog = defaultSetData,
+    Dance = defaultSetData
 }
