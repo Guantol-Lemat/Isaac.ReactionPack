@@ -1,8 +1,8 @@
 ReactionPack.FunctionList = {
-    Nothing = {Apply = ReactionPack.DoNothing, Remove = ReactionPack.DoNothing, Id = ReactionPack.Sets.Nothing},
-    Trauma = {Apply = Trauma.ApplyTrauma, Remove = Trauma.RemoveTrauma, Id = ReactionPack.Sets.Trauma},
-    Ugh = {Apply = Ughlite.ApplyUgh, Remove = Ughlite.RemoveUgh, Id = ReactionPack.Sets.Ugh},
-    Neutral = {Apply = Disappoint.ApplyNeutral, Remove = Disappoint.RemoveNeutral, Id = ReactionPack.Sets.Neutral},
-    Pog = {Apply = Poglite.ApplyPog, Remove = Poglite.RemovePog, Id = ReactionPack.Sets.Pog},
-    Dance = {Apply = Epic.ApplyDance, Remove = Epic.RemoveDance, Id = ReactionPack.Sets.Dance}
+    Disabled = {Apply = ReactionPack.DoNothing, Remove = ReactionPack.DoNothing, Id = ReactionPack.Sets.Disabled},
+    Trauma = {Apply = ReactionPack.ApplyTrauma, Remove = ReactionPack.RemoveTrauma, Id = ReactionPack.Sets.Trauma},
+    Ugh = {Apply = ReactionPack.ApplyUgh, Remove = ReactionPack.RemoveUgh, Id = ReactionPack.Sets.Ugh},
+    Neutral = {Apply = ReactionPack.ApplyNeutral, Remove = ReactionPack.RemoveNeutral, Id = ReactionPack.Sets.Neutral},
+    Pog = {Apply = ReactionPack.ApplyPog, Remove = ReactionPack.RemovePog, Id = ReactionPack.Sets.Pog},
+    Dance = {Apply = ReactionPack.ApplyDance, Remove = ReactionPack.RemoveDance, Id = ReactionPack.Sets.Dance}
 }

@@ -1,0 +1,6 @@
+<sounds root="sfx/">
+	<sound name="TankmanUgh">
+		<sample weight="1" path="reaction/tank_ugh1.wav" />
+		<sample weight="1" path="reaction/tank_ugh2.wav" />
+	</sound>
+</sounds>

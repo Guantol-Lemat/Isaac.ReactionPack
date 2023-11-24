@@ -1,176 +1,219 @@
 ReactionPack = RegisterMod("Reactions Port Pack", 1)
 
-Trauma = ReactionPack
-Ughlite = ReactionPack
-Disappoint = ReactionPack
-Poglite = ReactionPack
-Epic = ReactionPack
-
 ReactionPack.ModVersion = "1.0.0"
 
 require("ReactionPack_scripts/enum")
+require("ReactionPack_scripts/conversion")
+local log = require("ReactionPack_scripts.functions.log")
 
 local gameStarted = false
 
 ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
 local players = {}
 ReactionPack.AppliedCostumes = {}
 local ReactionMusicIsPlaying = false
+local PlayedCustomSound = -1
 
-ReactionPack.Sets = {
-    Nothing = 0,
-    Trauma = 1,
-    Ugh = 2,
-    Neutral = 3,
-    Pog = 4,
-    Dance = 5
-}
-
-ReactionPack.IdToSetName = {
-    [ReactionPack.Sets.Nothing] = "Disabled",
-    [ReactionPack.Sets.Trauma] = "Trauma",
-    [ReactionPack.Sets.Ugh] = "Ugh",
-    [ReactionPack.Sets.Neutral] = "Neutral",
-    [ReactionPack.Sets.Pog] = "Pog",
-    [ReactionPack.Sets.Dance] = "Dance",
-}
-
-ReactionPack.CostumeSets = {
-    [ReactionPack.Sets.Nothing] = {IDs = {"Disabled"}},
-    [ReactionPack.Sets.Trauma] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Ugh] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Neutral] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Pog] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Dance] = {IDs ={}, Default = {}}
-}
-ReactionPack.MusicSets = {
-    [ReactionPack.Sets.Nothing] = {IDs = {"Disabled"}},
-    [ReactionPack.Sets.Trauma] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Ugh] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Neutral] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Pog] = {IDs ={}, Default = {}},
-    [ReactionPack.Sets.Dance] = {IDs ={}, Default = {}}
-}
+for _, setType in pairs(ReactionPack.SetTypes) do
+    ReactionPack[setType] = {
+        [ReactionPack.Sets.Disabled] = {IDs = {"Disabled"}},
+        [ReactionPack.Sets.Trauma] = {IDs ={}, Default = {}},
+        [ReactionPack.Sets.Ugh] = {IDs ={}, Default = {}},
+        [ReactionPack.Sets.Neutral] = {IDs ={}, Default = {}},
+        [ReactionPack.Sets.Pog] = {IDs ={}, Default = {}},
+        [ReactionPack.Sets.Dance] = {IDs ={}, Default = {}}
+    }
+end
 
 local blindBypassToVisibility = {
     [false] = ReactionAPI.Context.Visibility.VISIBLE,
     [true] = ReactionAPI.Context.Visibility.ABSOLUTE
 }
 
+local function IsCostumeWellFormatted(CostumeEntry)
+    return (CostumeEntry.Apply == nil or type(CostumeEntry.Apply) == "table") and (CostumeEntry.Remove == nil or type(CostumeEntry.Remove) == "table")
+end
+
 local function AddPack(Entries, PackName, Default, Set, SetType)
     if ReactionPack[SetType][Set][PackName] ~= nil then
-        local errorString = "[ERROR in AddPack]: Pack Already Exists"
-        Isaac.ConsoleOutput(errorString)
-        Isaac.DebugString(errorString)
+        log.print("[ERROR in AddPack]: Pack Already Exists")
         return
     end
-    ReactionPack[SetType][Set][PackName] = Entries
+    if type(Default) ~= "table" then
+        log.print("[ERROR in AddPack " .. SetType .. "]: Default " .. string.gsub(SetType, "Sets", "") .. " in Pack [" .. PackName .. "] are not formatted as a table, as such the Pack has not been added")
+        return
+    end
+    if SetType == ReactionPack.SetTypes.Costume and not IsCostumeWellFormatted(Default) then
+        log.print("[ERROR in AddPack " .. SetType .. "]: Default " .. string.gsub(SetType, "Sets", "") .. " in Pack [" .. PackName .. "] is not well formatted, as such the Pack has not been added")
+        return
+    end
+    ReactionPack[SetType][Set][PackName] = {}
+    for playerID, entries in pairs(Entries) do
+
+        if type(entries) ~= "table" then
+            log.print("[ERROR in AddPack " .. SetType .. "]: " .. string.gsub(SetType, "Set", "") .. " for characterID [" .. playerID .. "] in Pack [" .. PackName .. "] are not formatted as a table, as such they have been ignored")
+            goto continue
+        end
+        if SetType == ReactionPack.SetTypes.Costume and not IsCostumeWellFormatted(entries) then
+            log.print("[ERROR in AddPack " .. SetType .. "]: " .. string.gsub(SetType, "Set", "") .. " for characterID [" .. playerID .. "] in Pack [" .. PackName .. "] are not well formatted, as such the Pack has not been added")
+            goto continue
+        end
+        ReactionPack[SetType][Set][PackName][playerID] = entries
+        ::continue::
+    end
+--    ReactionPack[SetType][Set][PackName] = Entries
     table.insert(ReactionPack[SetType][Set].IDs, PackName)
     ReactionPack[SetType][Set][PackName].Default = Default
 end
 
 local function EditPack(Entries, PackName, Overwrite, Set, SetType)
     if ReactionPack[SetType][Set][PackName] == nil then
-        local errorString = "[ERROR in EditPack]: Pack Does Not Exist"
-        Isaac.ConsoleOutput(errorString)
-        Isaac.DebugString(errorString)
+        log.print("[ERROR in EditPack]: Pack Does Not Exist")
         return
     end
     Overwrite = Overwrite or false
     for playerID, entries in pairs(Entries) do
-        if ReactionPack[SetType][Set][PackName][playerID] ~= nil or Overwrite then
+        if ReactionPack[SetType][Set][PackName][playerID] == nil or Overwrite then
+            if type(entries) ~= "table" then
+                log.print("[ERROR in EditPack " .. SetType .. "]: " .. string.gsub(SetType, "Set", "") .. " for characterID [" .. playerID .. "] are not formatted as a table, as such they have been ignored")
+                goto continue
+            end
+            if SetType == ReactionPack.SetTypes.Costume and not IsCostumeWellFormatted(entries) then
+                log.print("[ERROR in AddPack " .. SetType .. "]: " .. string.gsub(SetType, "Set", "") .. " for characterID [" .. playerID .. "] in Pack [" .. PackName .. "] are not well formatted, as such the Pack has not been added")
+                goto continue
+            end
             ReactionPack[SetType][Set][PackName][playerID] = entries
         end
+        ::continue::
     end
 end
 
-function Trauma:AddTraumaCostumePack(Costumes, PackName, Default)
+function ReactionPack:AddTraumaCostumePack(Costumes, PackName, Default)
     AddPack(Costumes, PackName, Default, ReactionPack.Sets.Trauma, "CostumeSets")
 end
 
-function Trauma:EditTraumaCostumePack(Costumes, PackName, Overwrite)
+function ReactionPack:EditTraumaCostumePack(Costumes, PackName, Overwrite)
     EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Trauma, "CostumeSets")
 end
 
-function Ughlite:AddUghCostumePack(Costumes, PackName, Default)
+function ReactionPack:AddUghCostumePack(Costumes, PackName, Default)
     AddPack(Costumes, PackName, Default, ReactionPack.Sets.Ugh, "CostumeSets")
 end
 
-function Ughlite:EditUghCostumePack(Costumes, PackName, Overwrite)
+function ReactionPack:EditUghCostumePack(Costumes, PackName, Overwrite)
     EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Ugh, "CostumeSets")
 end
 
-function Disappoint:AddNeutralCostumePack(Costumes, PackName, Default)
+function ReactionPack:AddNeutralCostumePack(Costumes, PackName, Default)
     AddPack(Costumes, PackName, Default, ReactionPack.Sets.Neutral, "CostumeSets")
 end
 
-function Disappoint:EditNeutralCostumePack(Costumes, PackName, Overwrite)
+function ReactionPack:EditNeutralCostumePack(Costumes, PackName, Overwrite)
     EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Neutral, "CostumeSets")
 end
 
-function Poglite:AddPogCostumePack(Costumes, PackName, Default)
+function ReactionPack:AddPogCostumePack(Costumes, PackName, Default)
     AddPack(Costumes, PackName, Default, ReactionPack.Sets.Pog, "CostumeSets")
 end
 
-function Poglite:EditPogCostumePack(Costumes, PackName, Overwrite)
+function ReactionPack:EditPogCostumePack(Costumes, PackName, Overwrite)
     EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Pog, "CostumeSets")
 end
 
-function Epic:AddDanceCostumePack(Costumes, PackName, Default)
+function ReactionPack:AddDanceCostumePack(Costumes, PackName, Default)
     AddPack(Costumes, PackName, Default, ReactionPack.Sets.Dance, "CostumeSets")
 end
 
-function Epic:EditDanceCostumePack(Costumes, PackName, Overwrite)
+function ReactionPack:EditDanceCostumePack(Costumes, PackName, Overwrite)
     EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Dance, "CostumeSets")
 end
 
-function Trauma:AddTraumaMusicPack(Tracks, PackName, Default)
+function ReactionPack:AddTraumaMusicPack(Tracks, PackName, Default)
     AddPack(Tracks, PackName, Default, ReactionPack.Sets.Trauma, "MusicSets")
 end
 
-function Trauma:EditTraumaMusicPack(Tracks, PackName, Overwrite)
+function ReactionPack:EditTraumaMusicPack(Tracks, PackName, Overwrite)
     EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Trauma, "MusicSets")
 end
 
-function Ughlite:AddUghMusicPack(Tracks, PackName, Default)
+function ReactionPack:AddUghMusicPack(Tracks, PackName, Default)
     AddPack(Tracks, PackName, Default, ReactionPack.Sets.Ugh, "MusicSets")
 end
 
-function Ughlite:EditUghMusicPack(Tracks, PackName, Overwrite)
+function ReactionPack:EditUghMusicPack(Tracks, PackName, Overwrite)
     EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Ugh, "MusicSets")
 end
 
-function Disappoint:AddNeutralMusicPack(Tracks, PackName, Default)
+function ReactionPack:AddNeutralMusicPack(Tracks, PackName, Default)
     AddPack(Tracks, PackName, Default, ReactionPack.Sets.Neutral, "MusicSets")
 end
 
-function Disappoint:EditNeutralMusicPack(Tracks, PackName, Overwrite)
+function ReactionPack:EditNeutralMusicPack(Tracks, PackName, Overwrite)
     EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Neutral, "MusicSets")
 end
 
-function Poglite:AddPogMusicPack(Tracks, PackName, Default)
+function ReactionPack:AddPogMusicPack(Tracks, PackName, Default)
     AddPack(Tracks, PackName, Default, ReactionPack.Sets.Pog, "MusicSets")
 end
 
-function Poglite:EditPogMusicPack(Tracks, PackName, Overwrite)
+function ReactionPack:EditPogMusicPack(Tracks, PackName, Overwrite)
     EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Pog, "MusicSets")
 end
 
-function Epic:AddDanceMusicPack(Tracks, PackName, Default)
+function ReactionPack:AddDanceMusicPack(Tracks, PackName, Default)
     AddPack(Tracks, PackName, Default, ReactionPack.Sets.Dance, "MusicSets")
 end
 
-function Epic:EditDanceMusicPack(Tracks, PackName, Overwrite)
+function ReactionPack:EditDanceMusicPack(Tracks, PackName, Overwrite)
     EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Dance, "MusicSets")
 end
 
-require("ReactionPack_scripts.tables.traumatized_costumes")
-require("ReactionPack_scripts.tables.traumatized_music")
-require("ReactionPack_scripts.tables.ugh_costumes")
-require("ReactionPack_scripts.tables.disappointed_costumes")
-require("ReactionPack_scripts.tables.pog_costumes")
-require("ReactionPack_scripts.tables.specialist_costumes")
-require("ReactionPack_scripts.tables.specialist_music")
+function ReactionPack:AddTraumaSoundPack(Tracks, PackName, Default)
+    AddPack(Tracks, PackName, Default, ReactionPack.Sets.Trauma, "SoundSets")
+end
+
+function ReactionPack:EditTraumaSoundPack(Tracks, PackName, Overwrite)
+    EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Trauma, "SoundSets")
+end
+
+function ReactionPack:AddUghSoundPack(Tracks, PackName, Default)
+    AddPack(Tracks, PackName, Default, ReactionPack.Sets.Ugh, "SoundSets")
+end
+
+function ReactionPack:EditUghSoundPack(Tracks, PackName, Overwrite)
+    EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Ugh, "SoundSets")
+end
+
+function ReactionPack:AddNeutralSoundPack(Tracks, PackName, Default)
+    AddPack(Tracks, PackName, Default, ReactionPack.Sets.Neutral, "SoundSets")
+end
+
+function ReactionPack:EditNeutralSoundPack(Tracks, PackName, Overwrite)
+    EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Neutral, "SoundSets")
+end
+
+function ReactionPack:AddPogSoundPack(Tracks, PackName, Default)
+    AddPack(Tracks, PackName, Default, ReactionPack.Sets.Pog, "SoundSets")
+end
+
+function ReactionPack:EditPogSoundPack(Tracks, PackName, Overwrite)
+    EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Pog, "SoundSets")
+end
+
+function ReactionPack:AddDanceSoundPack(Tracks, PackName, Default)
+    AddPack(Tracks, PackName, Default, ReactionPack.Sets.Dance, "SoundSets")
+end
+
+function ReactionPack:EditDanceSoundPack(Tracks, PackName, Overwrite)
+    EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Dance, "SoundSets")
+end
+
+require("ReactionPack_scripts.pack.traumatized")
+require("ReactionPack_scripts.pack.ugh")
+require("ReactionPack_scripts.pack.disappointed")
+require("ReactionPack_scripts.pack.pog")
+require("ReactionPack_scripts.pack.specialist")
 
 function ReactionPack:DoNothing()
 end
@@ -187,22 +230,26 @@ local function ApplyCostume(SetName)
     for playerNum = 0, Game():GetNumPlayers() do
         local player = Game():GetPlayer(playerNum)
         local playerType = player:GetPlayerType()
-        local applyCostume = nil
-        local removeCostume = nil
+        local applyCostumes = nil
+        local removeCostumes = nil
         if ReactionPack.CostumeSets[costumeSet][packName][playerType] == nil then
-            applyCostume = ReactionPack.CostumeSets[costumeSet][packName].Default.Apply
-            removeCostume = ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
+            applyCostumes = ReactionPack.CostumeSets[costumeSet][packName].Default.Apply
+            removeCostumes = ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
         else
-            applyCostume = ReactionPack.CostumeSets[costumeSet][packName][playerType].Apply or ReactionPack.CostumeSets[costumeSet][packName].Default.Apply
-            removeCostume = ReactionPack.CostumeSets[costumeSet][packName][playerType].Remove or ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
+            applyCostumes = ReactionPack.CostumeSets[costumeSet][packName][playerType].Apply or ReactionPack.CostumeSets[costumeSet][packName].Default.Apply
+            removeCostumes = ReactionPack.CostumeSets[costumeSet][packName][playerType].Remove or ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
         end
-
-        if applyCostume then
-            player:AddNullCostume(applyCostume)
-            ReactionPack.AppliedCostumes[playerNum] = applyCostume
+        if applyCostumes then
+            ReactionPack.AppliedCostumes[playerNum] = {}
+            for _, costume in ipairs(applyCostumes) do
+                player:AddNullCostume(costume)
+                table.insert(ReactionPack.AppliedCostumes[playerNum], costume)
+            end
         end
-        if removeCostume then
-            player:TryRemoveNullCostume(removeCostume)
+        if removeCostumes then
+            for _, costume in ipairs(removeCostumes) do
+                player:TryRemoveNullCostume(costume)
+            end
         end
     end
 end
@@ -213,19 +260,24 @@ local function RemoveCostume(SetName)
     for playerNum = 0, Game():GetNumPlayers() do
         local player = Game():GetPlayer(playerNum)
         local playerType = player:GetPlayerType()
-        local applyCostume = nil
+        local applyCostumes = nil
         if ReactionPack.CostumeSets[costumeSet][packName][playerType] == nil then
-            applyCostume = ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
+            applyCostumes = ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
         else
-            applyCostume = ReactionPack.CostumeSets[costumeSet][packName][playerType].Remove or ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
+            applyCostumes = ReactionPack.CostumeSets[costumeSet][packName][playerType].Remove or ReactionPack.CostumeSets[costumeSet][packName].Default.Remove
         end
-		local removeCostume = ReactionPack.AppliedCostumes[playerNum]
+		local removeCostumes = ReactionPack.AppliedCostumes[playerNum]
 
-        if applyCostume then
-            player:AddNullCostume(applyCostume)
+        if applyCostumes then
+            for _, costume in ipairs(applyCostumes) do
+                player:AddNullCostume(costume)
+            end
         end
-        if removeCostume then
-            player:TryRemoveNullCostume(removeCostume)
+        if removeCostumes then
+            for _, costume in ipairs(removeCostumes) do
+                player:TryRemoveNullCostume(costume)
+            end
+            ReactionPack.AppliedCostumes[playerNum] = {}
         end
     end
 end
@@ -236,11 +288,13 @@ local function ApplyMusic(SetName)
     local player = Game():GetPlayer(1)
     local playerType = player:GetPlayerType()
 
-    local musicName = ReactionPack.MusicSets[musicSet][packName][playerType] or ReactionPack.MusicSets[musicSet][packName].Default
-    local music = Isaac.GetMusicIdByName(musicName)
+    local musicList = ReactionPack.MusicSets[musicSet][packName][playerType] or ReactionPack.MusicSets[musicSet][packName].Default
+    local randomMusic = math.random(1, #musicList)
+    local musicName = musicList[randomMusic]
+    local musicID = Isaac.GetMusicIdByName(musicName)
 
-    if MusicManager():GetCurrentMusicID() ~= music then
-        MusicManager():Play(music, 1);
+    if MusicManager():GetCurrentMusicID() ~= musicID then
+        MusicManager():Play(musicID, 1);
     end
     MusicManager():UpdateVolume()
     ReactionMusicIsPlaying = true
@@ -251,17 +305,37 @@ local function RemoveMusic()
     ReactionMusicIsPlaying = false
 end
 
+local function PlaySound(soundSet, soundPack)
+    local player = Game():GetPlayer(1)
+    local playerType = player:GetPlayerType()
+
+    local sounds = ReactionPack.SoundSets[soundSet][soundPack][playerType] or ReactionPack.SoundSets[soundSet][soundPack].Default
+
+    local randomSound = math.random(1, #sounds)
+    local soundName = sounds[randomSound]
+    local soundId = Isaac.GetSoundIdByName(soundName)
+    if soundId == -1 then
+        log.print("[ERROR in PlaySound]: Sound (" .. soundName .. ") does not exist")
+        return
+    end
+    if PlayedCustomSound ~= -1 then
+        SFXManager():Stop(PlayedCustomSound)
+    end
+    SFXManager():Play(soundId)
+    PlayedCustomSound = soundId
+end
+
 local function ApplySet(SetName)
-    if ReactionPack.Settings[SetName].CostumeSet ~= ReactionPack.Sets.Nothing then
+    if ReactionPack.Settings[SetName].CostumeSet ~= ReactionPack.Sets.Disabled then
         ApplyCostume(SetName)
     end
-    if ReactionPack.Settings[SetName].MusicSet ~= ReactionPack.Sets.Nothing then
+    if ReactionPack.Settings[SetName].MusicSet ~= ReactionPack.Sets.Disabled then
         ApplyMusic(SetName)
     end
 end
 
 local function RemoveSet(SetName)
-    if ReactionPack.Settings[SetName].CostumeSet ~= ReactionPack.Sets.Nothing then
+    if ReactionPack.Settings[SetName].CostumeSet ~= ReactionPack.Sets.Disabled then
         RemoveCostume(SetName)
     end
     if ReactionMusicIsPlaying then
@@ -273,64 +347,63 @@ end
 --SET APPLY/REMOVE--
 --------------------
 
-function Trauma.ApplyTrauma()
+function ReactionPack.ApplyTrauma()
     ApplySet("Trauma")
 end
 
-function Trauma.RemoveTrauma()
+function ReactionPack.RemoveTrauma()
     RemoveSet("Trauma")
 end
 
-function Ughlite.ApplyUgh()
+function ReactionPack.ApplyUgh()
     ApplySet("Ugh")
 end
 
-function Ughlite.RemoveUgh()
+function ReactionPack.RemoveUgh()
     RemoveSet("Ugh")
 end
 
-function Disappoint.ApplyNeutral()
+function ReactionPack.ApplyNeutral()
     ApplySet("Neutral")
 end
 
-function Disappoint.RemoveNeutral()
+function ReactionPack.RemoveNeutral()
     RemoveSet("Neutral")
 end
 
-function Poglite.ApplyPog()
+function ReactionPack.ApplyPog()
     ApplySet("Pog")
 end
 
-function Poglite.RemovePog()
+function ReactionPack.RemovePog()
     RemoveSet("Pog")
 end
 
-function Epic.ApplyDance()
+function ReactionPack.ApplyDance()
     ApplySet("Dance")
 end
 
-function Epic.RemoveDance()
+function ReactionPack.RemoveDance()
     RemoveSet("Dance")
 end
 
 require("ReactionPack_scripts.tables.function_list")
 require("ReactionPack_scripts.tables.default_settings")
+require("ReactionPack_scripts.save_data")
 
 local function IsInBattle()
     return Isaac.CountBosses() > 0 or Isaac.CountEnemies() > 0
 end
 
-local function UpdateReaction()
-    if not gameStarted then
-        return
-    end
+-----------------------------
+--UPDATE REACTION FUNCTIONS--
+-----------------------------
+
+local function UpdateCostumeAndMusic()
     local collectibleQuality
-    if not ReactionPack.Settings.ReactInBattle and IsInBattle() then
-        collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
-    else
-        local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
-        collectibleQuality = ReactionAPI.Interface.cGetBestQuality(visibility)
-    end
+    local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
+    collectibleQuality = ReactionAPI.Interface.cGetBestQuality(visibility)
+
     local qualityChanged = collectibleQuality ~= ReactionPack.previous_collectibleQuality
     local playerChanged = false
 
@@ -347,15 +420,67 @@ local function UpdateReaction()
         ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
         ReactionPack.ApplyFunctions[collectibleQuality]()
     end
+
     ReactionPack.previous_collectibleQuality = collectibleQuality
 end
 
-ReactionPack:AddCallback(ModCallbacks.MC_POST_UPDATE, UpdateReaction)
+local function UpdateSound()
+    local newCollectibleQualityStatus
+    local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
+    newCollectibleQualityStatus = ReactionAPI.Interface.cGetQualityStatus(visibility, ReactionAPI.Context.Filter.NEW)
+
+    local isCustomSoundNotPlaying = not (SFXManager():IsPlaying(PlayedCustomSound))
+    local newCollectibleQuality = newCollectibleQualityStatus == 0 and ReactionAPI.QualityStatus.NO_ITEMS or math.floor(math.log(newCollectibleQualityStatus, 2)) - 1
+    local isNewCollectibleQualityGreaterThanPrevious = ReactionPack.previous_newCollectibleQuality < newCollectibleQuality
+
+    if (isCustomSoundNotPlaying or isNewCollectibleQualityGreaterThanPrevious) then
+        ReactionPack.previous_newCollectibleQuality = newCollectibleQuality
+        if newCollectibleQuality == ReactionAPI.QualityStatus.NO_ITEMS then
+            return
+        end
+        local settingName = ReactionPack.QualityStatusToReactionSetting[newCollectibleQuality]
+        local setId = ReactionPack.Settings[settingName]
+        local setName = ReactionPack.IdToSetName[setId]
+        local soundSet = ReactionPack.Settings[setName].SoundSet
+        if soundSet == ReactionPack.Sets.Disabled then
+            return
+        end
+        local packName = ReactionPack.SoundSets[soundSet].IDs[ReactionPack.Settings[setName].SoundPack]
+        PlaySound(soundSet, packName)
+    end
+end
+
+local function UpdateReaction()
+    if not gameStarted then
+        return
+    end
+    if not ReactionPack.Settings.ReactInBattle and IsInBattle() then
+        return
+    end
+
+    UpdateCostumeAndMusic()
+    UpdateSound()
+end
+
+require("ReactionPack_scripts.api.compatibility")
+local integrity = require("ReactionPack_scripts.functions.integrity_check")
+local ModMenu = require("ReactionPack_scripts.modcompat.modconfig")
 
 local function OnGameStart()
     gameStarted = true
-    require("ReactionPack_scripts.modcompat.modconfig")
+    integrity.CheckIntegrity()
+    ModMenu.InitModConfigMenu()
     ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, OnGameStart)
 end
 
-ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, OnGameStart) 
+local function ResetOnStartContinue()
+    ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
+
+    ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+    ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+end
+
+ReactionPack:AddCallback(ModCallbacks.MC_POST_UPDATE, UpdateReaction)
+ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, OnGameStart)
+ReactionPack:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, ResetOnStartContinue)
+
