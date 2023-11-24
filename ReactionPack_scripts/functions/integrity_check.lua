@@ -1,4 +1,4 @@
-local log = require("ReactionPack_scripts.functions.log")
+local log = require("reactionpack_scripts.functions.log")
 local module = {}
 
 local function SavedReactionExists(Reaction)

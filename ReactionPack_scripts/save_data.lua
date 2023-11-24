@@ -1,5 +1,5 @@
 local json = require("json")
-local utility = require("ReactionPack_scripts.functions.utility")
+local utility = require("reactionpack_scripts.functions.utility")
 local deepcopy = utility.DeepCopy
 
 ReactionPack.Settings = deepcopy(ReactionPack.DefaultSettings)
