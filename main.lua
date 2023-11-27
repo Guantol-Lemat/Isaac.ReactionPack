@@ -328,9 +328,44 @@ if ReactionAPI then
         ReactionMusicIsPlaying = true
     end
 
-    local function RemoveMusic()
+    local function ChallengeRemoveMusic()
+        MusicManager():Play(Music.MUSIC_CHALLENGE_FIGHT, 1);
+        ReactionMusicIsPlaying = false
+    end
+
+    local function BossRushRemoveMusic()
+        MusicManager():Play(Music.MUSIC_BOSS_RUSH, 1);
+        ReactionMusicIsPlaying = false
+    end
+
+    local function DefaultRemoveMusic()
         Game():GetRoom():PlayMusic()
         ReactionMusicIsPlaying = false
+    end
+
+    local function RemoveMusic()
+        local room = Game():GetRoom()
+        local roomType = room:GetType()
+
+        if room:IsAmbushActive() then
+            if roomType == RoomType.ROOM_CHALLENGE then
+                if MusicManager():GetCurrentMusicID() ~= Music.MUSIC_CHALLENGE_FIGHT then
+                    ChallengeRemoveMusic()
+                    return
+                else
+                    return
+                end
+            end
+            if roomType == RoomType.ROOM_BOSSRUSH then 
+                if MusicManager():GetCurrentMusicID() ~= Music.MUSIC_BOSS_RUSH then
+                    BossRushRemoveMusic()
+                    return
+                else
+                    return
+                end
+            end
+        end
+        DefaultRemoveMusic()
     end
 
     local function PlaySound(soundSet, soundPack)
