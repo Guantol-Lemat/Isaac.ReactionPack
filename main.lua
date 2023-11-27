@@ -270,6 +270,7 @@ if ReactionAPI then
             if applyCostumes then
                 ReactionPack.AppliedCostumes[playerNum] = {}
                 for _, costume in ipairs(applyCostumes) do
+                    if costume == -1 then costume = ReactionPack.CostumeSets[costumeSet][packName].Default.Apply[1] end
                     player:AddNullCostume(costume)
                     table.insert(ReactionPack.AppliedCostumes[playerNum], costume)
                 end
@@ -321,6 +322,12 @@ if ReactionAPI then
         local musicName = musicList[randomMusic]
         local musicID = Isaac.GetMusicIdByName(musicName)
 
+        if musicID == -1 then
+            musicList = ReactionPack.MusicSets[musicSet][packName].Default
+            randomMusic = math.random(1, #musicList)
+            musicName = musicList[randomMusic]
+            musicID = Isaac.GetMusicIdByName(musicName)
+        end
         if MusicManager():GetCurrentMusicID() ~= musicID then
             MusicManager():Play(musicID, 1);
         end
@@ -524,8 +531,10 @@ if ReactionAPI then
     --CALLBACK FUNCTIONS--
     ----------------------
 
+    require("reactionpack_scripts.api.interface")
     require("reactionpack_scripts.api.compatibility")
     local ModMenu = require("reactionpack_scripts.modcompat.modconfig")
+    local Epiphany = require("reactionpack_scripts.compatibility.epiphany")
 
     local function UpdateReaction()
         if not ReactionPack.gameStarted then
@@ -539,9 +548,10 @@ if ReactionAPI then
         UpdateSound()
     end
 
-    local function InitMCM()
+    local function InitMenuAndPatches()
         ModMenu.InitModConfigMenu()
-        ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, InitMCM)
+        Epiphany.PatchEpiphany()
+        ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, InitMenuAndPatches)
     end
 
     local function ResetOnStartContinue()
@@ -557,7 +567,7 @@ if ReactionAPI then
     end
 
     ReactionPack:AddCallback(ModCallbacks.MC_POST_UPDATE, UpdateReaction)
-    ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, InitMCM)
+    ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, InitMenuAndPatches)
     ReactionPack:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, ResetOnStartContinue)
     ReactionPack:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, ResetOnExit)
 
