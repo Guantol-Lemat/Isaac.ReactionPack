@@ -6,10 +6,16 @@ ReactionPack.ModVersion = "1.0.0"
 ReactionPack.Enabled = true --Check this to see if ReactionPack is actually enabled or not
 
 if ReactionAPI then
+
+    -------------
+    --VARIABLES--
+    -------------
+
     require("reactionpack_scripts/enum")
     require("reactionpack_scripts/conversion")
 
-    local gameStarted = false
+    ReactionPack.gameStarted = false
+    local firstStart = false
 
     ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
     ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
@@ -33,6 +39,14 @@ if ReactionAPI then
         [false] = ReactionAPI.Context.Visibility.VISIBLE,
         [true] = ReactionAPI.Context.Visibility.ABSOLUTE
     }
+
+    local function IsInBattle()
+        return Isaac.CountBosses() > 0 or Isaac.CountEnemies() > 0
+    end
+
+    -----------------------
+    --BASE PACK FUNCTIONS--
+    -----------------------
 
     local function IsCostumeWellFormatted(CostumeEntry)
         return (CostumeEntry.Apply == nil or type(CostumeEntry.Apply) == "table") and (CostumeEntry.Remove == nil or type(CostumeEntry.Remove) == "table")
@@ -65,7 +79,6 @@ if ReactionAPI then
             ReactionPack[SetType][Set][PackName][playerID] = entries
             ::continue::
         end
-    --    ReactionPack[SetType][Set][PackName] = Entries
         table.insert(ReactionPack[SetType][Set].IDs, PackName)
         ReactionPack[SetType][Set][PackName].Default = Default
     end
@@ -92,131 +105,143 @@ if ReactionAPI then
         end
     end
 
-    function ReactionPack:AddTraumaCostumePack(Costumes, PackName, Default)
+    -------
+    --API--
+    -------
+
+    function ReactionPack.AddTraumaCostumePack(Costumes, PackName, Default)
         AddPack(Costumes, PackName, Default, ReactionPack.Sets.Trauma, "CostumeSets")
     end
 
-    function ReactionPack:EditTraumaCostumePack(Costumes, PackName, Overwrite)
+    function ReactionPack.EditTraumaCostumePack(Costumes, PackName, Overwrite)
         EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Trauma, "CostumeSets")
     end
 
-    function ReactionPack:AddUghCostumePack(Costumes, PackName, Default)
+    function ReactionPack.AddUghCostumePack(Costumes, PackName, Default)
         AddPack(Costumes, PackName, Default, ReactionPack.Sets.Ugh, "CostumeSets")
     end
 
-    function ReactionPack:EditUghCostumePack(Costumes, PackName, Overwrite)
+    function ReactionPack.EditUghCostumePack(Costumes, PackName, Overwrite)
         EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Ugh, "CostumeSets")
     end
 
-    function ReactionPack:AddNeutralCostumePack(Costumes, PackName, Default)
+    function ReactionPack.AddNeutralCostumePack(Costumes, PackName, Default)
         AddPack(Costumes, PackName, Default, ReactionPack.Sets.Neutral, "CostumeSets")
     end
 
-    function ReactionPack:EditNeutralCostumePack(Costumes, PackName, Overwrite)
+    function ReactionPack.EditNeutralCostumePack(Costumes, PackName, Overwrite)
         EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Neutral, "CostumeSets")
     end
 
-    function ReactionPack:AddPogCostumePack(Costumes, PackName, Default)
+    function ReactionPack.AddPogCostumePack(Costumes, PackName, Default)
         AddPack(Costumes, PackName, Default, ReactionPack.Sets.Pog, "CostumeSets")
     end
 
-    function ReactionPack:EditPogCostumePack(Costumes, PackName, Overwrite)
+    function ReactionPack.EditPogCostumePack(Costumes, PackName, Overwrite)
         EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Pog, "CostumeSets")
     end
 
-    function ReactionPack:AddDanceCostumePack(Costumes, PackName, Default)
+    function ReactionPack.AddDanceCostumePack(Costumes, PackName, Default)
         AddPack(Costumes, PackName, Default, ReactionPack.Sets.Dance, "CostumeSets")
     end
 
-    function ReactionPack:EditDanceCostumePack(Costumes, PackName, Overwrite)
+    function ReactionPack.EditDanceCostumePack(Costumes, PackName, Overwrite)
         EditPack(Costumes, PackName, Overwrite, ReactionPack.Sets.Dance, "CostumeSets")
     end
 
-    function ReactionPack:AddTraumaMusicPack(Tracks, PackName, Default)
+    function ReactionPack.AddTraumaMusicPack(Tracks, PackName, Default)
         AddPack(Tracks, PackName, Default, ReactionPack.Sets.Trauma, "MusicSets")
     end
 
-    function ReactionPack:EditTraumaMusicPack(Tracks, PackName, Overwrite)
+    function ReactionPack.EditTraumaMusicPack(Tracks, PackName, Overwrite)
         EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Trauma, "MusicSets")
     end
 
-    function ReactionPack:AddUghMusicPack(Tracks, PackName, Default)
+    function ReactionPack.AddUghMusicPack(Tracks, PackName, Default)
         AddPack(Tracks, PackName, Default, ReactionPack.Sets.Ugh, "MusicSets")
     end
 
-    function ReactionPack:EditUghMusicPack(Tracks, PackName, Overwrite)
+    function ReactionPack.EditUghMusicPack(Tracks, PackName, Overwrite)
         EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Ugh, "MusicSets")
     end
 
-    function ReactionPack:AddNeutralMusicPack(Tracks, PackName, Default)
+    function ReactionPack.AddNeutralMusicPack(Tracks, PackName, Default)
         AddPack(Tracks, PackName, Default, ReactionPack.Sets.Neutral, "MusicSets")
     end
 
-    function ReactionPack:EditNeutralMusicPack(Tracks, PackName, Overwrite)
+    function ReactionPack.EditNeutralMusicPack(Tracks, PackName, Overwrite)
         EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Neutral, "MusicSets")
     end
 
-    function ReactionPack:AddPogMusicPack(Tracks, PackName, Default)
+    function ReactionPack.AddPogMusicPack(Tracks, PackName, Default)
         AddPack(Tracks, PackName, Default, ReactionPack.Sets.Pog, "MusicSets")
     end
 
-    function ReactionPack:EditPogMusicPack(Tracks, PackName, Overwrite)
+    function ReactionPack.EditPogMusicPack(Tracks, PackName, Overwrite)
         EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Pog, "MusicSets")
     end
 
-    function ReactionPack:AddDanceMusicPack(Tracks, PackName, Default)
+    function ReactionPack.AddDanceMusicPack(Tracks, PackName, Default)
         AddPack(Tracks, PackName, Default, ReactionPack.Sets.Dance, "MusicSets")
     end
 
-    function ReactionPack:EditDanceMusicPack(Tracks, PackName, Overwrite)
+    function ReactionPack.EditDanceMusicPack(Tracks, PackName, Overwrite)
         EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Dance, "MusicSets")
     end
 
-    function ReactionPack:AddTraumaSoundPack(Tracks, PackName, Default)
-        AddPack(Tracks, PackName, Default, ReactionPack.Sets.Trauma, "SoundSets")
+    function ReactionPack.AddTraumaSoundPack(Sounds, PackName, Default)
+        AddPack(Sounds, PackName, Default, ReactionPack.Sets.Trauma, "SoundSets")
     end
 
-    function ReactionPack:EditTraumaSoundPack(Tracks, PackName, Overwrite)
-        EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Trauma, "SoundSets")
+    function ReactionPack.EditTraumaSoundPack(Sounds, PackName, Overwrite)
+        EditPack(Sounds, PackName, Overwrite, ReactionPack.Sets.Trauma, "SoundSets")
     end
 
-    function ReactionPack:AddUghSoundPack(Tracks, PackName, Default)
-        AddPack(Tracks, PackName, Default, ReactionPack.Sets.Ugh, "SoundSets")
+    function ReactionPack.AddUghSoundPack(Sounds, PackName, Default)
+        AddPack(Sounds, PackName, Default, ReactionPack.Sets.Ugh, "SoundSets")
     end
 
-    function ReactionPack:EditUghSoundPack(Tracks, PackName, Overwrite)
-        EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Ugh, "SoundSets")
+    function ReactionPack.EditUghSoundPack(Sounds, PackName, Overwrite)
+        EditPack(Sounds, PackName, Overwrite, ReactionPack.Sets.Ugh, "SoundSets")
     end
 
-    function ReactionPack:AddNeutralSoundPack(Tracks, PackName, Default)
-        AddPack(Tracks, PackName, Default, ReactionPack.Sets.Neutral, "SoundSets")
+    function ReactionPack.AddNeutralSoundPack(Sounds, PackName, Default)
+        AddPack(Sounds, PackName, Default, ReactionPack.Sets.Neutral, "SoundSets")
     end
 
-    function ReactionPack:EditNeutralSoundPack(Tracks, PackName, Overwrite)
-        EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Neutral, "SoundSets")
+    function ReactionPack.EditNeutralSoundPack(Sounds, PackName, Overwrite)
+        EditPack(Sounds, PackName, Overwrite, ReactionPack.Sets.Neutral, "SoundSets")
     end
 
-    function ReactionPack:AddPogSoundPack(Tracks, PackName, Default)
-        AddPack(Tracks, PackName, Default, ReactionPack.Sets.Pog, "SoundSets")
+    function ReactionPack.AddPogSoundPack(Sounds, PackName, Default)
+        AddPack(Sounds, PackName, Default, ReactionPack.Sets.Pog, "SoundSets")
     end
 
-    function ReactionPack:EditPogSoundPack(Tracks, PackName, Overwrite)
-        EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Pog, "SoundSets")
+    function ReactionPack.EditPogSoundPack(Sounds, PackName, Overwrite)
+        EditPack(Sounds, PackName, Overwrite, ReactionPack.Sets.Pog, "SoundSets")
     end
 
-    function ReactionPack:AddDanceSoundPack(Tracks, PackName, Default)
-        AddPack(Tracks, PackName, Default, ReactionPack.Sets.Dance, "SoundSets")
+    function ReactionPack.AddDanceSoundPack(Sounds, PackName, Default)
+        AddPack(Sounds, PackName, Default, ReactionPack.Sets.Dance, "SoundSets")
     end
 
-    function ReactionPack:EditDanceSoundPack(Tracks, PackName, Overwrite)
-        EditPack(Tracks, PackName, Overwrite, ReactionPack.Sets.Dance, "SoundSets")
+    function ReactionPack.EditDanceSoundPack(Sounds, PackName, Overwrite)
+        EditPack(Sounds, PackName, Overwrite, ReactionPack.Sets.Dance, "SoundSets")
     end
+
+    ---------------
+    --INSERT PACK--
+    ---------------
 
     require("reactionpack_scripts.pack.traumatized")
     require("reactionpack_scripts.pack.ugh")
     require("reactionpack_scripts.pack.disappointed")
     require("reactionpack_scripts.pack.pog")
     require("reactionpack_scripts.pack.specialist")
+
+    ------------
+    --SETTINGS--
+    ------------
 
     function ReactionPack:DoNothing()
     end
@@ -328,11 +353,14 @@ if ReactionAPI then
         PlayedCustomSound = soundId
     end
 
+    local qualityChanged = false -- Used to guarantee that music is not re-applied when "switching" characters like the Forgotten
+    local playerChanged = false
+
     local function ApplySet(SetName)
         if ReactionPack.Settings[SetName].CostumeSet ~= ReactionPack.Sets.Disabled then
             ApplyCostume(SetName)
         end
-        if ReactionPack.Settings[SetName].MusicSet ~= ReactionPack.Sets.Disabled then
+        if ReactionPack.Settings[SetName].MusicSet ~= ReactionPack.Sets.Disabled and not playerChanged then
             ApplyMusic(SetName)
         end
     end
@@ -341,7 +369,7 @@ if ReactionAPI then
         if ReactionPack.Settings[SetName].CostumeSet ~= ReactionPack.Sets.Disabled then
             RemoveCostume(SetName)
         end
-        if ReactionMusicIsPlaying then
+        if ReactionMusicIsPlaying and not playerChanged then
             RemoveMusic()
         end
     end
@@ -394,10 +422,6 @@ if ReactionAPI then
     require("reactionpack_scripts.tables.default_settings")
     require("reactionpack_scripts.save_data")
 
-    local function IsInBattle()
-        return Isaac.CountBosses() > 0 or Isaac.CountEnemies() > 0
-    end
-
     -----------------------------
     --UPDATE REACTION FUNCTIONS--
     -----------------------------
@@ -407,8 +431,8 @@ if ReactionAPI then
         local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
         collectibleQuality = ReactionAPI.Interface.cGetBestQuality(visibility)
 
-        local qualityChanged = collectibleQuality ~= ReactionPack.previous_collectibleQuality
-        local playerChanged = false
+        --[[local]] qualityChanged = collectibleQuality ~= ReactionPack.previous_collectibleQuality
+        --[[local]] playerChanged = false
 
         for playerNum = 0, Game():GetNumPlayers() do
             local player = Game():GetPlayer(playerNum)
@@ -417,6 +441,11 @@ if ReactionAPI then
                 playerChanged = true
             end
             players[playerNum] = playerType
+        end
+
+        if firstStart then
+            playerChanged = false
+            firstStart = false
         end
 
         if qualityChanged or playerChanged then
@@ -443,6 +472,9 @@ if ReactionAPI then
             end
             local settingName = ReactionPack.QualityStatusToReactionSetting[newCollectibleQuality]
             local setId = ReactionPack.Settings[settingName]
+            if setId == 0 then
+                return
+            end
             local setName = ReactionPack.IdToSetName[setId]
             local soundSet = ReactionPack.Settings[setName].SoundSet
             if soundSet == ReactionPack.Sets.Disabled then
@@ -453,8 +485,15 @@ if ReactionAPI then
         end
     end
 
+    ----------------------
+    --CALLBACK FUNCTIONS--
+    ----------------------
+
+    require("reactionpack_scripts.api.compatibility")
+    local ModMenu = require("reactionpack_scripts.modcompat.modconfig")
+
     local function UpdateReaction()
-        if not gameStarted then
+        if not ReactionPack.gameStarted then
             return
         end
         if not ReactionPack.Settings.ReactInBattle and IsInBattle() then
@@ -465,15 +504,9 @@ if ReactionAPI then
         UpdateSound()
     end
 
-    require("reactionpack_scripts.api.compatibility")
-    local integrity = require("reactionpack_scripts.functions.integrity_check")
-    local ModMenu = require("reactionpack_scripts.modcompat.modconfig")
-
-    local function OnGameStart()
-        gameStarted = true
-        integrity.CheckIntegrity()
+    local function InitMCM()
         ModMenu.InitModConfigMenu()
-        ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, OnGameStart)
+        ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, InitMCM)
     end
 
     local function ResetOnStartContinue()
@@ -483,9 +516,15 @@ if ReactionAPI then
         ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
     end
 
+    local function ResetOnExit()
+        ResetOnStartContinue()
+        ReactionPack.gameStarted = false
+    end
+
     ReactionPack:AddCallback(ModCallbacks.MC_POST_UPDATE, UpdateReaction)
-    ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, OnGameStart)
+    ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, InitMCM)
     ReactionPack:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, ResetOnStartContinue)
+    ReactionPack:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, ResetOnExit)
 
 else
     ReactionPack.Enabled = false

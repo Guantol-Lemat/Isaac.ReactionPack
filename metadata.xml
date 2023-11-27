@@ -1,8 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-	<name>!Reaction_port_pack</name>
-	<directory>reaction_port_pack</directory>
-	<description/>
-	<version>1.0</version>
-	<visibility/>
-</metadata>
+    <name>!Reaction_port_pack</name>
+    <directory>reaction_port_pack</directory>
+    <id>3096196396</id>
+    <description>[b]This pack depends on [url=]ReactionAPI[/url] in order to function, and cannot display reactions on it's own. Be sure to enable both![/b]
 
+Reaction Port Pack is a package of well-known Reaction to Quality Items mods, but the quality detection system is powered by [b]ReactionAPI[/b], which improves on some issues found within the older mods.
+
+[u]Included Mods[/u]
+[list]
+  [*] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2798746733]Ugh for Bad Items: High Effort[/url]
+  [*] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2612456876]Not Mad, Just Disappointed for Quality 0 Items[/url]
+  [*] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2490515687]POG for Good Items[/url]
+  [*] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2575911103]Specialist Dance for Good Items[/url]
+[/list]
+
+It also adds a new Reaction for Quality 0 based off of [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2815404414]the lost pain scale[/url] and [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2702605985]Traumatized Mr. Incredible for bad items[/url]
+
+This mod also works as an [b]API[/b] that allows mod creators to add their Costumes, Music and Sounds to a library that the user can then choose from, when customizing each reaction.
+Check [u]reactionpack_scripts\api\interface.lua[/u] for more Info on how to implement Packages.
+
+[u]TODO[/u]
+[list]
+  [*] Create a Randomize Packs option for each reaction.
+[/list]</description>
+    <version>1.2</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Items"/>
+    <tag id="Active Items"/>
+    <tag id="Pickups"/>
+    <tag id="Player Characters"/>
+    <tag id="Graphics"/>
+    <tag id="Sound Effects"/>
+    <tag id="Music"/>
+</metadata>

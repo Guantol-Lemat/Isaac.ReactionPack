@@ -51,8 +51,6 @@ local music = {
     [PlayerType.PLAYER_CAIN_B] = {"paincialist"}
 }
 
+ReactionPack.AddDanceCostumePack(costumes, "Specialist", costumeDefault)
 
-ReactionPack:AddTraumaCostumePack(costumes, "Specialist", costumeDefault)
-ReactionPack:AddDanceCostumePack(costumes, "Specialist", costumeDefault)
-
-ReactionPack:AddDanceMusicPack(music, "Specialist", musicDefault)
+ReactionPack.AddDanceMusicPack(music, "Specialist", musicDefault)

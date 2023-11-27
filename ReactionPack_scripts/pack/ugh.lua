@@ -24,7 +24,6 @@ local costumes = {
 
 local soundDefault = {'TankmanUgh'}
 
-ReactionPack:AddTraumaCostumePack(costumes, "Ugh", costumeDefault)
-ReactionPack:AddUghCostumePack(costumes, "Ugh", costumeDefault)
+ReactionPack.AddUghCostumePack(costumes, "Ugh", costumeDefault)
 
-ReactionPack:AddUghSoundPack({}, "Tankman Ugh", soundDefault)
+ReactionPack.AddUghSoundPack({}, "Tankman Ugh", soundDefault)

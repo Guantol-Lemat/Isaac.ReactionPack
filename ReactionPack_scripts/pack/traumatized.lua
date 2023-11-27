@@ -28,6 +28,6 @@ local music = {
     [PlayerType.PLAYER_CAIN_B] = {"happyburningmemory"}
 }
 
-ReactionPack:AddTraumaCostumePack(costumes, "Traumatized", costumeDefault)
+ReactionPack.AddTraumaCostumePack(costumes, "Traumatized", costumeDefault)
 
-ReactionPack:AddTraumaMusicPack(music, "Traumatized", musicDefault)
+ReactionPack.AddTraumaMusicPack(music, "Traumatized", musicDefault)
