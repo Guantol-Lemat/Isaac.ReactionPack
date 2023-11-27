@@ -21,5 +21,4 @@ local costumes = {
     [PlayerType.PLAYER_JACOB2_B] = {["Apply"] = {PogAnm("jacob2pogb")}, ["Remove"] = {BaseAnm("character_b17_jacob2")}}
 }
 
-ReactionPack:AddTraumaCostumePack(costumes, "Pog", costumeDefault)
-ReactionPack:AddPogCostumePack(costumes, "Pog", costumeDefault)
+ReactionPack.AddPogCostumePack(costumes, "Pog", costumeDefault)

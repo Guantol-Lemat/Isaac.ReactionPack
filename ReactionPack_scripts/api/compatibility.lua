@@ -14,7 +14,7 @@ function Trauma:AddUghCostume(key,playerType,ughCostumeId,removeCostumeId,active
     if removeCostumeId then
         costumes[playerType].Remove = {removeCostumeId}
     end
-    ReactionPack:EditTraumaCostumePack(costumes, "Traumatized", false)
+    ReactionPack.EditTraumaCostumePack(costumes, "Traumatized", false)
 end
 
 Ughlite = {Integrity = true}
@@ -27,7 +27,7 @@ function Ughlite:AddUghCostume(key,playerType,ughCostumeId,removeCostumeId,activ
     if removeCostumeId then
         costumes[playerType].Remove = {removeCostumeId}
     end
-    ReactionPack:EditUghCostumePack(costumes, "Ugh", false)
+    ReactionPack.EditUghCostumePack(costumes, "Ugh", false)
 end
 
 Poglite = {Integrity = true}
@@ -40,7 +40,7 @@ function Poglite:AddPogCostume(key,playerType,pogCostumeId,removeCostumeId,activ
     if removeCostumeId then
         costumes[playerType].Remove = {removeCostumeId}
     end
-    ReactionPack:EditPogCostumePack(costumes, "Pog", false)
+    ReactionPack.EditPogCostumePack(costumes, "Pog", false)
 end
 
 SpecialistModAPI = {Integrity = true}
@@ -50,11 +50,11 @@ function SpecialistModAPI:AddDanceCostume(playerType --[[PlayerType]] , costumeI
     if costumeID then
         costumes[playerType].Apply = {costumeID}
     end
-    ReactionPack:EditDanceCostumePack(costumes, "Specialist", override)
+    ReactionPack.EditDanceCostumePack(costumes, "Specialist", override)
 end
 function SpecialistModAPI:RemoveDanceCostume(playerType --[[PlayerType]] )
     local costumes = {[playerType] = nil}
-    ReactionPack:EditDanceCostumePack(costumes, "Specialist", true)
+    ReactionPack.EditDanceCostumePack(costumes, "Specialist", true)
 end
 
 function SpecialistModAPI:AddItemCostume(collectibleType --[[CollectibleType]] , costumeID --[[int]] , override --[[boolean]] )

@@ -113,10 +113,9 @@ function InitModConfigMenu()
 
         --General: Reaction Choice
 
+        ModConfigMenu.AddSpace(categoryName, "General")
         ModConfigMenu.AddText(categoryName, "General", function() return "The Priority Order is:" end)
         ModConfigMenu.AddText(categoryName, "General", function() return "Glitched < Q 0 < Q 1 < Q 2 < Q 3 < Q 4" end)
-        ModConfigMenu.AddSpace(categoryName, "General")
-
 
         ModConfigMenu.AddSetting(categoryName, "General",
         {

@@ -17,5 +17,4 @@ local costumes = {
     [PlayerType.PLAYER_LAZARUS2_B] = {["Apply"] = {DisappointAnm("Disappointed_Animation_LazarusB2")}, ["Remove"] = {BaseAnm("character_b09_lazarus2")}}
 }
 
-ReactionPack:AddTraumaCostumePack(costumes, "Disappointed", costumeDefault)
-ReactionPack:AddNeutralCostumePack(costumes, "Disappointed", costumeDefault)
+ReactionPack.AddNeutralCostumePack(costumes, "Disappointed", costumeDefault)

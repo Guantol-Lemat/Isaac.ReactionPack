@@ -1,6 +1,18 @@
 local log = require("reactionpack_scripts.functions.log")
 local module = {}
 
+local function FindPackID(SetName, SetType, SearchedName, PackData)
+    local SavedSetID = ReactionPack.SavedSettings[SetName][ReactionPack.SetTypeToPacks[SetType].Set]
+
+    for packId, packName in ipairs(ReactionPack[SetType][SavedSetID].IDs) do
+        if packName == SearchedName then
+            return packId
+        end
+    end
+    log.print("[ERROR in ReactionPack]: Confirmed Pack [" .. SearchedName .. "] could not be found")
+    return ReactionPack.DefaultSettings[SetName][PackData.Pack]
+end
+
 local function SavedReactionExists(Reaction)
     local SavedFunctionID = ReactionPack.SavedSettings[Reaction]
 
@@ -77,6 +89,8 @@ local function CheckSetIntegrity()
                 ResetPackToDefault(setName, setType, packData)
                 goto continue
             end
+            local savedPackName = ReactionPack.SavedSettings[setName][ReactionPack.SetTypeToPacks[setType].Pack]
+            ReactionPack.Settings[setName][packData.Pack] = FindPackID(setName, setType, savedPackName, packData)
             ::continue::
         end
     end
