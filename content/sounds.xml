@@ -1,6 +1,15 @@
 <sounds root="sfx/">
+
+	<!-- TRAUMATIZED -->
+
+	<sound name="TASMScream">
+		<sample weight="1" path="reaction/traumatized/tasm_scream.wav" />
+	</sound>
+	
+	<!-- UGH -->
+	
 	<sound name="TankmanUgh">
-		<sample weight="1" path="reaction/tank_ugh1.wav" />
-		<sample weight="1" path="reaction/tank_ugh2.wav" />
+		<sample weight="1" path="reaction/ugh/tank_ugh1.wav" />
+		<sample weight="1" path="reaction/ugh/tank_ugh2.wav" />
 	</sound>
 </sounds>

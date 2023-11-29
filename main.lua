@@ -2,8 +2,11 @@ ReactionPack = RegisterMod("Reactions Port Pack", 1)
 
 local log = require("reactionpack_scripts.functions.log")
 
-ReactionPack.ModVersion = "1.0.0"
+ReactionPack.ModVersion = "1.0.1"
 ReactionPack.Enabled = true --Check this to see if ReactionPack is actually enabled or not
+ReactionPack.Diagnostics = {
+    SAVE = false
+}
 
 if ReactionAPI then
 
@@ -337,16 +340,24 @@ if ReactionAPI then
 
     local function ChallengeRemoveMusic()
         MusicManager():Play(Music.MUSIC_CHALLENGE_FIGHT, 1);
+        MusicManager():UpdateVolume()
         ReactionMusicIsPlaying = false
     end
 
     local function BossRushRemoveMusic()
         MusicManager():Play(Music.MUSIC_BOSS_RUSH, 1);
+        MusicManager():UpdateVolume()
         ReactionMusicIsPlaying = false
     end
 
     local function DefaultRemoveMusic()
-        Game():GetRoom():PlayMusic()
+        if MMC and MMC.Initialised then
+            local stageTrack = MMC.GetStageTrack()
+            MusicManager():Play(stageTrack, 1);
+            MusicManager():UpdateVolume()
+        else
+            Game():GetRoom():PlayMusic()
+        end
         ReactionMusicIsPlaying = false
     end
 
@@ -571,12 +582,13 @@ if ReactionAPI then
     ReactionPack:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, ResetOnStartContinue)
     ReactionPack:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, ResetOnExit)
 
+    require("reactionpack_scripts.version_changelog")
 else
     ReactionPack.Enabled = false
 
     local game = Game()
     log.print("[ERROR in ReactionPack]: ReactionAPI is not enabled")
-    -- Stolen from LuaDebug Reminder
+    -- Code from LuaDebug Reminder
 
     -- change this to true to render the text at the bottom of the screen
     local renderAtBottom = false
