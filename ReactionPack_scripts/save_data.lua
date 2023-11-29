@@ -1,6 +1,7 @@
 local json = require("json")
 local utility = require("reactionpack_scripts.functions.utility")
 local deepcopy = utility.DeepCopy
+local log = require("reactionpack_scripts.functions.log")
 
 local integrity = require("reactionpack_scripts.functions.integrity_check")
 
@@ -11,6 +12,7 @@ ReactionPack.SavedSettings = {}
 --------
 
 local function SetToDefault()
+    log.diagnostic("SAVE", "Setting to Default")
     ReactionPack.Settings = deepcopy(ReactionPack.DefaultSettings)
     ReactionPack.SavedSettings = deepcopy(ReactionPack.Settings)
 
@@ -20,12 +22,16 @@ local function SetToDefault()
         ReactionPack.SavedSettings[setName].MusicPack = ReactionPack.MusicSets[defaultSetting.MusicSet].IDs[defaultSetting.MusicPack]
         ReactionPack.SavedSettings[setName].SoundPack = ReactionPack.SoundSets[defaultSetting.SoundSet].IDs[defaultSetting.SoundPack]
     end
+    log.diagnostic("SAVE", "Here are the Default Settings:\n" .. json.encode(ReactionPack.SavedSettings))
 end
 
 local function LoadData()
+    log.diagnostic("SAVE", "Attempting Load")
     if ReactionPack:HasData() then
+        log.diagnostic("SAVE", "savedata Has Been Found")
         local loadedData = json.decode(ReactionPack:LoadData())
 
+        log.diagnostic("SAVE", "Data Loaded:\n" .. json.encode(loadedData))
         ReactionPack.Settings.ReactInBattle = loadedData.ReactInBattle == nil and true or loadedData.ReactInBattle
         ReactionPack.Settings.BlindBypass = loadedData.BlindBypass or false
 
@@ -43,12 +49,16 @@ local function LoadData()
         end
 
         ReactionPack.SavedSettings = deepcopy(ReactionPack.Settings)
+        ReactionPack.SavedSettings.ModVersion = loadedData.ModVersion or ReactionPack.ModVersion
 
         for _, setName in ipairs(ReactionPack.IdToSetName) do
             ReactionPack.SavedSettings[setName].CostumePack = loadedData[setName].CostumePack or ""
             ReactionPack.SavedSettings[setName].MusicPack = loadedData[setName].MusicPack or ""
             ReactionPack.SavedSettings[setName].SoundPack = loadedData[setName].SoundPack or ""
         end
+        log.diagnostic("SAVE", "savedata Has Been Loaded")
+    else
+        log.diagnostic("SAVE", "savedata Has NOT Been Found")
     end
 end
 
@@ -56,7 +66,9 @@ local function OnGameStart()
     ReactionPack.gameStarted = true
     SetToDefault()
     LoadData()
+    log.diagnostic("SAVE", "Data Before Integrity Check:\n" .. json.encode(ReactionPack.SavedSettings))
     integrity.CheckIntegrity()
+    log.diagnostic("SAVE", "Data After Integrity Check:\n" .. json.encode(ReactionPack.SavedSettings))
 end
 
 ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, OnGameStart)
@@ -66,13 +78,19 @@ ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPrio
 --------
 
 local function SaveSettings()
+    log.diagnostic("SAVE", "Attempting Save (no data will actually be saved)")
     ReactionPack.SavedSettings = deepcopy(ReactionPack.Settings)
+    ReactionPack.SavedSettings.ModVersion = ReactionPack.ModVersion
 
     for _, setName in ipairs(ReactionPack.IdToSetName) do
         local setRoot = ReactionPack.SavedSettings[setName]
         ReactionPack.SavedSettings[setName].CostumePack = ReactionPack.CostumeSets[setRoot.CostumeSet].IDs[setRoot.CostumePack]
         ReactionPack.SavedSettings[setName].MusicPack = ReactionPack.MusicSets[setRoot.MusicSet].IDs[setRoot.MusicPack]
         ReactionPack.SavedSettings[setName].SoundPack = ReactionPack.SoundSets[setRoot.SoundSet].IDs[setRoot.SoundPack]
+    end
+    log.diagnostic("SAVE", "This is the data the mod is attempting to save:\n" .. json.encode(ReactionPack.SavedSettings))
+    if ReactionPack.Diagnostics.SAVE then
+        return
     end
     ReactionPack:SaveData(json.encode(ReactionPack.SavedSettings))
 end
