@@ -2,13 +2,18 @@ local news = "Reaction Port Pack News:"
 
 local versions = {
     "1.0.0",
-    "1.0.1"
+    "1.0.1",
+    "1.0.2"
 }
 
 local changeLog = {
     ["1.0.1"] = {
         "Now Compatible with Soundtrack Menu",
         "Added Diagnostics for easier Debugging"
+    },
+    ["1.0.2"] = {
+        "Tracks chosen in SoundTrack Menu will now be played correctly",
+        "Fixed an Issue where the Stage Track would play, when it otherwise shouldn't"
     },
     ["1.1.0"] = {
         "New POG Costume Pack",

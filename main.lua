@@ -2,7 +2,7 @@ ReactionPack = RegisterMod("Reactions Port Pack", 1)
 
 local log = require("reactionpack_scripts.functions.log")
 
-ReactionPack.ModVersion = "1.0.1"
+ReactionPack.ModVersion = "1.0.2"
 ReactionPack.Enabled = true --Check this to see if ReactionPack is actually enabled or not
 ReactionPack.Diagnostics = {
     SAVE = false
@@ -19,6 +19,7 @@ if ReactionAPI then
 
     ReactionPack.gameStarted = false
     local firstStart = false
+    local exitingGame = false
 
     ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
     ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
@@ -338,23 +339,75 @@ if ReactionAPI then
         ReactionMusicIsPlaying = true
     end
 
+    local function GetSoundtrackMenuSong(OriginalMusic)
+        local defaultSong= finddefaultsongindexbyID(OriginalMusic)
+        return findsongbydefaultIndex(defaultSong, false, false)
+    end
+
     local function ChallengeRemoveMusic()
-        MusicManager():Play(Music.MUSIC_CHALLENGE_FIGHT, 1);
-        MusicManager():UpdateVolume()
+        local challengeMusic = Music.MUSIC_CHALLENGE_FIGHT
+        if MMC and MMC.Initialised and SoundtrackSongList then
+            challengeMusic = GetSoundtrackMenuSong(challengeMusic)
+        end
+        if MusicManager():GetCurrentMusicID() ~= challengeMusic then
+            MusicManager():Play(challengeMusic, 1);
+            MusicManager():UpdateVolume()
+        end
         ReactionMusicIsPlaying = false
     end
 
     local function BossRushRemoveMusic()
-        MusicManager():Play(Music.MUSIC_BOSS_RUSH, 1);
-        MusicManager():UpdateVolume()
+        local bossRushMusic = Music.MUSIC_BOSS_RUSH
+        if MMC and MMC.Initialised and SoundtrackSongList then
+            bossRushMusic = GetSoundtrackMenuSong(bossRushMusic)
+        end
+        if MusicManager():GetCurrentMusicID() ~= bossRushMusic then
+            MusicManager():Play(bossRushMusic, 1);
+            MusicManager():UpdateVolume()
+        end
+        ReactionMusicIsPlaying = false
+    end
+
+    local function ClearedRoomRemoveMusic()
+        local clearedMusic = Music.MUSIC_BOSS_OVER
+        if MMC and MMC.Initialised and SoundtrackSongList then
+            clearedMusic = GetSoundtrackMenuSong(clearedMusic)
+        end
+        if MusicManager():GetCurrentMusicID() ~= clearedMusic then
+            MusicManager():Play(clearedMusic, 1);
+            MusicManager():UpdateVolume()
+        end
+        ReactionMusicIsPlaying = false
+    end
+
+    local function MirrorRemoveMusic()
+        local stageType = Game():GetLevel():GetStageType()
+        local mirrorMusic
+        if stageType == StageType.STAGETYPE_REPENTANCE_B then
+            mirrorMusic = Music.MUSIC_DROSS_REVERSE
+        else
+            mirrorMusic = Music.MUSIC_DOWNPOUR_REVERSE
+        end
+        if MMC and MMC.Initialised and SoundtrackSongList then
+            mirrorMusic = GetSoundtrackMenuSong(mirrorMusic)
+        end
+        if MusicManager():GetCurrentMusicID() ~= mirrorMusic then
+            MusicManager():Play(mirrorMusic, 1);
+            MusicManager():UpdateVolume()
+        end
         ReactionMusicIsPlaying = false
     end
 
     local function DefaultRemoveMusic()
         if MMC and MMC.Initialised then
             local stageTrack = MMC.GetStageTrack()
-            MusicManager():Play(stageTrack, 1);
-            MusicManager():UpdateVolume()
+            if SoundtrackSongList then
+                stageTrack = GetSoundtrackMenuSong(stageTrack)
+            end
+            if MusicManager():GetCurrentMusicID() ~= stageTrack then
+                MusicManager():Play(stageTrack, 1);
+                MusicManager():UpdateVolume()
+            end
         else
             Game():GetRoom():PlayMusic()
         end
@@ -362,26 +415,34 @@ if ReactionAPI then
     end
 
     local function RemoveMusic()
+        if exitingGame then
+            ReactionMusicIsPlaying = false
+            return
+        end
         local room = Game():GetRoom()
         local roomType = room:GetType()
 
         if room:IsAmbushActive() then
             if roomType == RoomType.ROOM_CHALLENGE then
-                if MusicManager():GetCurrentMusicID() ~= Music.MUSIC_CHALLENGE_FIGHT then
-                    ChallengeRemoveMusic()
-                    return
-                else
-                    return
-                end
+                ChallengeRemoveMusic()
+                return
             end
-            if roomType == RoomType.ROOM_BOSSRUSH then 
-                if MusicManager():GetCurrentMusicID() ~= Music.MUSIC_BOSS_RUSH then
-                    BossRushRemoveMusic()
-                    return
-                else
-                    return
-                end
+            if roomType == RoomType.ROOM_BOSSRUSH then
+                BossRushRemoveMusic()
+                return
             end
+        end
+        if room:IsAmbushDone() then
+            ClearedRoomRemoveMusic()
+            return
+        end
+        if (room:GetType() == RoomType.ROOM_BOSS or room:GetType() == RoomType.ROOM_MINIBOSS) and room:IsClear() then
+            ClearedRoomRemoveMusic()
+            return
+        end
+        if room:IsMirrorWorld() then
+            MirrorRemoveMusic()
+            return
         end
         DefaultRemoveMusic()
     end
@@ -480,6 +541,7 @@ if ReactionAPI then
     -----------------------------
 
     local function UpdateCostumeAndMusic()
+
         local collectibleQuality
         local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
         collectibleQuality = ReactionAPI.Interface.cGetBestQuality(visibility)
@@ -573,8 +635,10 @@ if ReactionAPI then
     end
 
     local function ResetOnExit()
+        exitingGame = true
         ResetOnStartContinue()
         ReactionPack.gameStarted = false
+        exitingGame = false
     end
 
     ReactionPack:AddCallback(ModCallbacks.MC_POST_UPDATE, UpdateReaction)
