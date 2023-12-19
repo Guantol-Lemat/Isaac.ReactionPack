@@ -2,7 +2,7 @@ ReactionPack = RegisterMod("Reactions Port Pack", 1)
 
 local log = require("reactionpack_scripts.functions.log")
 
-ReactionPack.ModVersion = "1.0.2"
+ReactionPack.ModVersion = "1.0.3"
 ReactionPack.Enabled = true --Check this to see if ReactionPack is actually enabled or not
 ReactionPack.Diagnostics = {
     SAVE = false
@@ -316,6 +316,9 @@ if ReactionAPI then
     end
 
     local function ApplyMusic(SetName)
+        if SnakeEater and SnakeEater:IsPlaying() and SnakeEater.Settings.Force then
+            return
+        end
         local musicSet = ReactionPack.Settings[SetName].MusicSet
         local packName = ReactionPack.MusicSets[musicSet].IDs[ReactionPack.Settings[SetName].MusicPack]
         local player = Game():GetPlayer(1)
@@ -419,30 +422,36 @@ if ReactionAPI then
             ReactionMusicIsPlaying = false
             return
         end
+        if SnakeEater and SnakeEater:IsPlaying() and SnakeEater.Settings.Force then
+            ReactionMusicIsPlaying = false
+            return
+        end
         local room = Game():GetRoom()
         local roomType = room:GetType()
 
-        if room:IsAmbushActive() then
-            if roomType == RoomType.ROOM_CHALLENGE then
-                ChallengeRemoveMusic()
+        if not Game():GetLevel():IsAscent() then
+            if room:IsAmbushActive() then
+                if roomType == RoomType.ROOM_CHALLENGE then
+                    ChallengeRemoveMusic()
+                    return
+                end
+                if roomType == RoomType.ROOM_BOSSRUSH then
+                    BossRushRemoveMusic()
+                    return
+                end
+            end
+            if room:IsAmbushDone() then
+                ClearedRoomRemoveMusic()
                 return
             end
-            if roomType == RoomType.ROOM_BOSSRUSH then
-                BossRushRemoveMusic()
+            if (room:GetType() == RoomType.ROOM_BOSS or room:GetType() == RoomType.ROOM_MINIBOSS) and room:IsClear() then
+                ClearedRoomRemoveMusic()
                 return
             end
-        end
-        if room:IsAmbushDone() then
-            ClearedRoomRemoveMusic()
-            return
-        end
-        if (room:GetType() == RoomType.ROOM_BOSS or room:GetType() == RoomType.ROOM_MINIBOSS) and room:IsClear() then
-            ClearedRoomRemoveMusic()
-            return
-        end
-        if room:IsMirrorWorld() then
-            MirrorRemoveMusic()
-            return
+            if room:IsMirrorWorld() then
+                MirrorRemoveMusic()
+                return
+            end
         end
         DefaultRemoveMusic()
     end
