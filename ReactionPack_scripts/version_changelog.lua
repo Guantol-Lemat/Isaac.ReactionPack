@@ -3,7 +3,8 @@ local news = "Reaction Port Pack News:"
 local versions = {
     "1.0.0",
     "1.0.1",
-    "1.0.2"
+    "1.0.2",
+    "1.0.3"
 }
 
 local changeLog = {
@@ -14,6 +15,10 @@ local changeLog = {
     ["1.0.2"] = {
         "Tracks chosen in SoundTrack Menu will now be played correctly",
         "Fixed an Issue where the Stage Track would play, when it otherwise shouldn't"
+    },
+    ["1.0.3"] = {
+        "Fixed an Issue where the Ascent Music would not play in certain rooms",
+        "Added compatibility with the \"Snake Eater on Ascent\" mod"
     },
     ["1.1.0"] = {
         "New POG Costume Pack",
