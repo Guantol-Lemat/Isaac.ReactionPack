@@ -17,6 +17,7 @@ local changeLog = {
         "Fixed an Issue where the Stage Track would play, when it otherwise shouldn't"
     },
     ["1.0.3"] = {
+        "Fixed an Issue that caused MC_PRE_GAME_EXIT callbacks from not being executed",
         "Fixed an Issue where the Ascent Music would not play in certain rooms",
         "Added compatibility with the \"Snake Eater on Ascent\" mod"
     },
@@ -27,6 +28,8 @@ local changeLog = {
         "Use the Settings to enable them"
     }
 }
+
+local removedDeleteMessages = false
 
 local renderAtBottom = false
 local addMessages = false
@@ -119,10 +122,14 @@ local function OnFirstRender()
 end
 
 local function DeleteMessages()
+    if removedDeleteMessages then
+        return
+    end
     counter = nil
     messageList = nil
     ReactionPack:RemoveCallback(ModCallbacks.MC_POST_RENDER, RenderMessages)
-    ReactionPack:RemoveCallback(ModCallbacks.MC_PRE_GAME_EXIT, DeleteMessages)
+    removedDeleteMessages = true
+--    ReactionPack:RemoveCallback(ModCallbacks.MC_PRE_GAME_EXIT, DeleteMessages)
 end
 
 ReactionPack:AddCallback(ModCallbacks.MC_POST_RENDER, OnFirstRender)
