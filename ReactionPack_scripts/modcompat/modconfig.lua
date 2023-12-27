@@ -47,6 +47,13 @@ function InitModConfigMenu()
         return defaultSet -- Should be impossible but just used to prevent infinite loops as a safety measure
     end
 
+    local function Reset()
+        ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
+
+        ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+        ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+    end
+
     if ModConfigMenu then
         ReactionPack.MCMStrings = {
             [true] = "True",
@@ -57,6 +64,15 @@ function InitModConfigMenu()
             [ReactionPack.FunctionList.Neutral.Id] = "Neutral",
             [ReactionPack.FunctionList.Pog.Id] = "Pog",
             [ReactionPack.FunctionList.Dance.Id] = "Dance",
+            Qualities = {
+                [ReactionAPI.QualityStatus.NO_ITEMS] = "Disabled",
+                [ReactionAPI.QualityStatus.GLITCHED] = "Glitched",
+                [ReactionAPI.QualityStatus.QUALITY_0] = "Quality 0",
+                [ReactionAPI.QualityStatus.QUALITY_1] = "Quality 1",
+                [ReactionAPI.QualityStatus.QUALITY_2] = "Quality 2",
+                [ReactionAPI.QualityStatus.QUALITY_3] = "Quality 3",
+                [ReactionAPI.QualityStatus.QUALITY_4] = "Quality 4"
+            }
         }
 
         local categoryName = "Reaction Port Pack"
@@ -106,9 +122,49 @@ function InitModConfigMenu()
                 return "React Whilst in Battle" .. ': ' .. choice
             end,
             OnChange = function(currentSetting)
+                Reset()
                 ReactionPack.Settings.ReactInBattle = currentSetting
             end,
             Info = {"If True, Isaac will react to Items even when there are enemies in the room"}
+        })
+
+        --General: DeathCertificateDimensionReaction
+
+        ModConfigMenu.AddSetting(categoryName, "General",
+        {
+            Type = ModConfigMenu.OptionType.BOOLEAN,
+            CurrentSetting = function ()
+                return ReactionPack.Settings.DeathCertificateDimensionReaction
+            end,
+            Display = function()
+                local choice = ReactionPack.MCMStrings[ReactionPack.Settings.DeathCertificateDimensionReaction]
+                return "React in Death Certificate Dimension" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                Reset()
+                ReactionPack.Settings.DeathCertificateDimensionReaction = currentSetting
+            end,
+            Info = {"If True, Isaac will react to Items when you are in the Death Certificate Dimension"}
+        })
+
+        --General: WhineThreshold
+
+        ModConfigMenu.AddSetting(categoryName, "General",
+        {
+            Type = ModConfigMenu.OptionType.NUMBER,
+            CurrentSetting = function()
+                return ReactionPack.Settings.WhineThreshold
+            end,
+            Minimum = ReactionAPI.QualityStatus.NO_ITEMS,
+            Maximum = ReactionAPI.QualityStatus.QUALITY_4,
+            Display = function()
+                local choice = ReactionPack.MCMStrings.Qualities[ReactionPack.Settings.WhineThreshold]
+                return "Whine Threshold" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                ReactionPack.Settings.WhineThreshold = currentSetting
+            end,
+            Info = {"When Isaac Picks Up an Item of a Certain Quality, he will not react (whine) to items of a lower Quality, unless it's above or equal to the Threshold."}
         })
 
         --General: Reaction Choice
@@ -256,6 +312,101 @@ function InitModConfigMenu()
             Info = {"Change the Reaction Isaac has when encountering Glitched Items"}
         })
 
+        ModConfigMenu.AddSpace(categoryName, "Extra")
+
+        ModConfigMenu.AddSetting(categoryName, "Extra",
+        {
+            Type = ModConfigMenu.OptionType.BOOLEAN,
+            CurrentSetting = function()
+                return ReactionPack.Settings.Isolation_0
+            end,
+            Display = function()
+                local choice = ReactionPack.MCMStrings[ReactionPack.Settings.Isolation_0]
+                return "Isolate Quality 0 Reaction" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                ReactionPack.Settings.Isolation_0 = currentSetting
+            end,
+            Info = {"If set to true then the Quality 0 reaction will only be shown if there are only Quality 0 items in the room, otherwise no reaction will be shown"}
+        })
+        ModConfigMenu.AddSetting(categoryName, "Extra",
+        {
+            Type = ModConfigMenu.OptionType.BOOLEAN,
+            CurrentSetting = function()
+                return ReactionPack.Settings.Isolation_1
+            end,
+            Display = function()
+                local choice = ReactionPack.MCMStrings[ReactionPack.Settings.Isolation_1]
+                return "Isolate Quality 1 Reaction" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                ReactionPack.Settings.Isolation_1 = currentSetting
+            end,
+            Info = {"If set to true then the Quality 1 reaction will only be shown if there are only Quality 1 items in the room, otherwise no reaction will be shown"}
+        })
+        ModConfigMenu.AddSetting(categoryName, "Extra",
+        {
+            Type = ModConfigMenu.OptionType.BOOLEAN,
+            CurrentSetting = function()
+                return ReactionPack.Settings.Isolation_2
+            end,
+            Display = function()
+                local choice = ReactionPack.MCMStrings[ReactionPack.Settings.Isolation_2]
+                return "Isolate Quality 2 Reaction" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                ReactionPack.Settings.Isolation_2 = currentSetting
+            end,
+            Info = {"If set to true then the Quality 2 reaction will only be shown if there are only Quality 2 items in the room, otherwise no reaction will be shown"}
+        })
+        ModConfigMenu.AddSetting(categoryName, "Extra",
+        {
+            Type = ModConfigMenu.OptionType.BOOLEAN,
+            CurrentSetting = function()
+                return ReactionPack.Settings.Isolation_3
+            end,
+            Display = function()
+                local choice = ReactionPack.MCMStrings[ReactionPack.Settings.Isolation_3]
+                return "Isolate Quality 3 Reaction" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                ReactionPack.Settings.Isolation_3 = currentSetting
+            end,
+            Info = {"If set to true then the Quality 3 reaction will only be shown if there are only Quality 3 items in the room, otherwise no reaction will be shown"}
+        })
+        ModConfigMenu.AddSetting(categoryName, "Extra",
+        {
+            Type = ModConfigMenu.OptionType.BOOLEAN,
+            CurrentSetting = function()
+                return ReactionPack.Settings.Isolation_4
+            end,
+            Display = function()
+                local choice = ReactionPack.MCMStrings[ReactionPack.Settings.Isolation_4]
+                return "Isolate Quality 4 Reaction" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                ReactionPack.Settings.Isolation_4 = currentSetting
+            end,
+            Info = {"If set to true then the Quality 4 reaction will only be shown if there are only Quality 4 items in the room, otherwise no reaction will be shown"}
+        })
+        ModConfigMenu.AddSetting(categoryName, "Extra",
+        {
+            Type = ModConfigMenu.OptionType.BOOLEAN,
+            CurrentSetting = function()
+                return ReactionPack.Settings.Isolation_Glitched
+            end,
+            Display = function()
+                local choice = ReactionPack.MCMStrings[ReactionPack.Settings.Isolation_Glitched]
+                return "Isolate Glitched Reaction" .. ': ' .. choice
+            end,
+            OnChange = function(currentSetting)
+                ReactionPack.Settings.Isolation_Glitched = currentSetting
+            end,
+            Info = {"If set to true then the Glitched reaction will only be shown if there are only Glitched items in the room, otherwise no reaction will be shown"}
+        })
+
+        --Individual Set Settings
+
         for set = ReactionPack.Sets.Trauma, ReactionPack.Sets.Dance do
             local setName = ReactionPack.IdToSetName[set]
 
@@ -275,8 +426,7 @@ function InitModConfigMenu()
                     return "CostumeSet" .. ': ' .. choice
                 end,
                 OnChange = function(currentSetting)
-                    ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
-                    ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+                    Reset()
 
                     ReactionPack.Settings[setName].CostumeSet = SkipOverEmptySets(currentSetting, ReactionPack.Settings[setName].CostumeSet, "CostumeSets")
                     ReactionPack.Settings[setName].CostumePack = defaultPack
@@ -296,8 +446,7 @@ function InitModConfigMenu()
                     return "CostumePack" .. ': ' .. choice
                 end,
                 OnChange = function(currentSetting)
-                    ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
-                    ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+                    Reset()
 
                     if currentSetting > #ReactionPack.CostumeSets[ReactionPack.Settings[setName].CostumeSet].IDs then
                         currentSetting = defaultPack
@@ -321,8 +470,7 @@ function InitModConfigMenu()
                     return "MusicSet" .. ': ' .. choice
                 end,
                 OnChange = function(currentSetting)
-                    ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
-                    ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+                    Reset()
 
                     ReactionPack.Settings[setName].MusicSet = SkipOverEmptySets(currentSetting, ReactionPack.Settings[setName].MusicSet, "MusicSets")
                     ReactionPack.Settings[setName].MusicPack = defaultPack
@@ -342,8 +490,7 @@ function InitModConfigMenu()
                     return "MusicPack" .. ': ' .. choice
                 end,
                 OnChange = function(currentSetting)
-                    ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
-                    ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+                    Reset()
 
                     if currentSetting > #ReactionPack.MusicSets[ReactionPack.Settings[setName].MusicSet].IDs then
                         currentSetting = defaultPack

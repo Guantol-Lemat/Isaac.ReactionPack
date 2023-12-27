@@ -4,7 +4,8 @@ local versions = {
     "1.0.0",
     "1.0.1",
     "1.0.2",
-    "1.0.3"
+    "1.0.3",
+    "1.0.4"
 }
 
 local changeLog = {
@@ -20,6 +21,12 @@ local changeLog = {
         "Fixed an Issue that caused MC_PRE_GAME_EXIT callbacks from not being executed",
         "Fixed an Issue where the Ascent Music would not play in certain rooms",
         "Added compatibility with the \"Snake Eater on Ascent\" mod"
+    },
+    ["1.0.4"] = {
+        "New Setting: Reaction Isolation",
+        "New Setting: React in Death Certificate Dimension",
+        "New Setting: Whine Prevention",
+        "Added a Template within the files for easier creation of packs"
     },
     ["1.1.0"] = {
         "New POG Costume Pack",

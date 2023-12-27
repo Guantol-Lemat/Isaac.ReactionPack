@@ -24,6 +24,8 @@ ReactionPack.RemoveFunctions = {
 
 ReactionPack.DefaultSettings.ReactInBattle = true
 ReactionPack.DefaultSettings.BlindBypass = false
+ReactionPack.DefaultSettings.DeathCertificateDimensionReaction = true
+ReactionPack.DefaultSettings.WhineThreshold = ReactionAPI.QualityStatus.NO_ITEMS
 
 ReactionPack.DefaultSettings.Reaction_Glitched = ReactionPack.FunctionList.Disabled.Id
 ReactionPack.DefaultSettings.Reaction_0 = ReactionPack.FunctionList.Trauma.Id
@@ -31,6 +33,13 @@ ReactionPack.DefaultSettings.Reaction_1 = ReactionPack.FunctionList.Ugh.Id
 ReactionPack.DefaultSettings.Reaction_2 = ReactionPack.FunctionList.Neutral.Id
 ReactionPack.DefaultSettings.Reaction_3 = ReactionPack.FunctionList.Pog.Id
 ReactionPack.DefaultSettings.Reaction_4 = ReactionPack.FunctionList.Dance.Id
+
+ReactionPack.DefaultSettings.Isolation_Glitched = false
+ReactionPack.DefaultSettings.Isolation_0 = false
+ReactionPack.DefaultSettings.Isolation_1 = false
+ReactionPack.DefaultSettings.Isolation_2 = false
+ReactionPack.DefaultSettings.Isolation_3 = false
+ReactionPack.DefaultSettings.Isolation_4 = false
 
 ReactionPack.DefaultSettings.Trauma = {CostumeSet = ReactionPack.Sets.Trauma, CostumePack = defaultPack, MusicSet = ReactionPack.Sets.Trauma, MusicPack = defaultPack, SoundSet = ReactionPack.Sets.Disabled, SoundPack = defaultPack}
 ReactionPack.DefaultSettings.Ugh = {CostumeSet = ReactionPack.Sets.Ugh, CostumePack = defaultPack, MusicSet = ReactionPack.Sets.Disabled, MusicPack = defaultPack, SoundSet = ReactionPack.Sets.Ugh, SoundPack = defaultPack}

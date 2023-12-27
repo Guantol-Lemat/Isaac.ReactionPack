@@ -1,5 +1,7 @@
 ReactionPack = RegisterMod("Reactions Port Pack", 1)
 
+local removeInitMenuAndPatches = false
+
 local log = require("reactionpack_scripts.functions.log")
 
 ReactionPack.ModVersion = "1.0.3"
@@ -18,8 +20,9 @@ if ReactionAPI then
     require("reactionpack_scripts/conversion")
 
     ReactionPack.gameStarted = false
-    local firstStart = false
+    local firstStart = true
     local exitingGame = false
+    local onRoomChange = false
 
     ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
     ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
@@ -44,8 +47,21 @@ if ReactionAPI then
         [true] = ReactionAPI.Context.Visibility.ABSOLUTE
     }
 
+    local QualityStatusToIsolation = {
+        [ReactionAPI.QualityStatus.GLITCHED] = "Isolation_Glitched",
+        [ReactionAPI.QualityStatus.QUALITY_0] = "Isolation_0",
+        [ReactionAPI.QualityStatus.QUALITY_1] = "Isolation_1",
+        [ReactionAPI.QualityStatus.QUALITY_2] = "Isolation_2",
+        [ReactionAPI.QualityStatus.QUALITY_3] = "Isolation_3",
+        [ReactionAPI.QualityStatus.QUALITY_4] = "Isolation_4",
+    }
+
     local function IsInBattle()
         return Isaac.CountBosses() > 0 or Isaac.CountEnemies() > 0
+    end
+
+    local function IsDeathCertificateDimension()
+        return Game():GetLevel():GetCurrentRoomDesc().Data.Name == 'Death Certificate'
     end
 
     -----------------------
@@ -418,7 +434,7 @@ if ReactionAPI then
     end
 
     local function RemoveMusic()
-        if exitingGame then
+        if exitingGame or onRoomChange then
             ReactionMusicIsPlaying = false
             return
         end
@@ -466,7 +482,6 @@ if ReactionAPI then
         local soundName = sounds[randomSound]
         local soundId = Isaac.GetSoundIdByName(soundName)
         if soundId == -1 then
-            log.print("[ERROR in PlaySound]: Sound (" .. soundName .. ") does not exist")
             return
         end
         if PlayedCustomSound ~= -1 then
@@ -549,14 +564,29 @@ if ReactionAPI then
     --UPDATE REACTION FUNCTIONS--
     -----------------------------
 
+    local bestQualityInRoom = ReactionAPI.QualityStatus.NO_ITEMS
+    local threshold
+
     local function UpdateCostumeAndMusic()
-
-        local collectibleQuality
         local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
-        collectibleQuality = ReactionAPI.Interface.cGetBestQuality(visibility)
+        local filter = ReactionAPI.Context.Filter.ALL
+        local collectibleQuality = ReactionAPI.Interface.cGetBestQuality(visibility)
 
-        --[[local]] qualityChanged = collectibleQuality ~= ReactionPack.previous_collectibleQuality
-        --[[local]] playerChanged = false
+        threshold = math.min(bestQualityInRoom, ReactionPack.Settings.WhineThreshold)
+
+        if collectibleQuality < threshold then
+            collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+        end
+
+        if collectibleQuality ~= ReactionAPI.QualityStatus.NO_ITEMS and ReactionPack.Settings[QualityStatusToIsolation[collectibleQuality]] then
+            local qualityStatus = ReactionAPI.Interface.cGetQualityStatus(visibility, filter)
+            if 2^(collectibleQuality + 1) < qualityStatus then
+                collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+            end
+        end
+
+        qualityChanged = collectibleQuality ~= ReactionPack.previous_collectibleQuality
+        playerChanged = false
 
         for playerNum = 0, Game():GetNumPlayers() do
             local player = Game():GetPlayer(playerNum)
@@ -581,12 +611,23 @@ if ReactionAPI then
     end
 
     local function UpdateSound()
-        local newCollectibleQualityStatus
         local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
-        newCollectibleQualityStatus = ReactionAPI.Interface.cGetQualityStatus(visibility, ReactionAPI.Context.Filter.NEW)
+        local filter = ReactionAPI.Context.Filter.NEW
+        local newCollectibleQualityStatus = ReactionAPI.Interface.cGetQualityStatus(visibility, filter)
 
         local isCustomSoundNotPlaying = not (SFXManager():IsPlaying(PlayedCustomSound))
         local newCollectibleQuality = newCollectibleQualityStatus == 0 and ReactionAPI.QualityStatus.NO_ITEMS or math.floor(math.log(newCollectibleQualityStatus, 2)) - 1
+
+        if newCollectibleQuality < threshold then
+            newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+        end
+
+        if newCollectibleQuality ~= ReactionAPI.QualityStatus.NO_ITEMS and ReactionPack.Settings[QualityStatusToIsolation[newCollectibleQuality]] then
+            if 2^(newCollectibleQuality + 1) < newCollectibleQualityStatus then
+                newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+            end
+        end
+
         local isNewCollectibleQualityGreaterThanPrevious = ReactionPack.previous_newCollectibleQuality < newCollectibleQuality
 
         if (isCustomSoundNotPlaying or isNewCollectibleQualityGreaterThanPrevious) then
@@ -625,38 +666,69 @@ if ReactionAPI then
         if not ReactionPack.Settings.ReactInBattle and IsInBattle() then
             return
         end
+        if not ReactionPack.Settings.DeathCertificateDimensionReaction and IsDeathCertificateDimension() then
+            return
+        end
 
         UpdateCostumeAndMusic()
         UpdateSound()
     end
 
     local function InitMenuAndPatches()
+        if removeInitMenuAndPatches then
+            return
+        end
         ModMenu.InitModConfigMenu()
         Epiphany.PatchEpiphany()
-        ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, InitMenuAndPatches)
+        removeInitMenuAndPatches = true
+--        ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, InitMenuAndPatches)
     end
 
-    local function ResetOnStartContinue()
+    local function OnCollectiblePickup(_, EntityPlayer)
+        if EntityPlayer.QueuedItem.Item then
+            if EntityPlayer.QueuedItem.Item:IsCollectible() then
+                bestQualityInRoom = math.max(bestQualityInRoom, ReactionAPI.CollectibleData[EntityPlayer.QueuedItem.Item.ID])
+            end
+        end
+    end
+
+    local function Reset()
         ReactionPack.RemoveFunctions[ReactionPack.previous_collectibleQuality]()
 
         ReactionPack.previous_collectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
         ReactionPack.previous_newCollectibleQuality = ReactionAPI.QualityStatus.NO_ITEMS
+
+        bestQualityInRoom = ReactionAPI.QualityStatus.NO_ITEMS
+    end
+
+    local function ResetOnNewRoom()
+        onRoomChange = true
+        Reset()
+        onRoomChange = false
     end
 
     local function ResetOnExit()
         exitingGame = true
-        ResetOnStartContinue()
+        Reset()
         ReactionPack.gameStarted = false
         exitingGame = false
     end
 
     ReactionPack:AddCallback(ModCallbacks.MC_POST_UPDATE, UpdateReaction)
     ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPriority.LATE, InitMenuAndPatches)
-    ReactionPack:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, ResetOnStartContinue)
+    ReactionPack:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, OnCollectiblePickup)
+    ReactionPack:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, Reset)
+    ReactionPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, ResetOnNewRoom)
     ReactionPack:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, ResetOnExit)
 
     require("reactionpack_scripts.version_changelog")
+
 else
+
+    ------------------------
+    --REACTION API MISSING--
+    ------------------------
+
     ReactionPack.Enabled = false
 
     local game = Game()
