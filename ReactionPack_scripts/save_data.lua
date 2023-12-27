@@ -34,6 +34,8 @@ local function LoadData()
         log.diagnostic("SAVE", "Data Loaded:\n" .. json.encode(loadedData))
         ReactionPack.Settings.ReactInBattle = loadedData.ReactInBattle == nil and true or loadedData.ReactInBattle
         ReactionPack.Settings.BlindBypass = loadedData.BlindBypass or false
+        ReactionPack.Settings.DeathCertificateDimensionReaction = loadedData.DeathCertificateDimensionReaction == nil and true or loadedData.DeathCertificateDimensionReaction
+        ReactionPack.Settings.WhineThreshold = loadedData.WhineThreshold or ReactionPack.Settings.WhineThreshold
 
         ReactionPack.Settings.Reaction_Glitched = loadedData.Reaction_Glitched or ReactionPack.FunctionList.Disabled.Id
         ReactionPack.Settings.Reaction_0 = loadedData.Reaction_0 or ReactionPack.FunctionList.Trauma.Id
@@ -41,6 +43,13 @@ local function LoadData()
         ReactionPack.Settings.Reaction_2 = loadedData.Reaction_2 or ReactionPack.FunctionList.Disappoint.Id
         ReactionPack.Settings.Reaction_3 = loadedData.Reaction_3 or ReactionPack.FunctionList.Pog.Id
         ReactionPack.Settings.Reaction_4 = loadedData.Reaction_4 or ReactionPack.FunctionList.Dance.Id
+
+        ReactionPack.Settings.Isolation_Glitched = loadedData.Isolation_Glitched or false
+        ReactionPack.Settings.Isolation_0 = loadedData.Isolation_0 or false
+        ReactionPack.Settings.Isolation_1 = loadedData.Isolation_1 or false
+        ReactionPack.Settings.Isolation_2 = loadedData.Isolation_2 or false
+        ReactionPack.Settings.Isolation_3 = loadedData.Isolation_3 or false
+        ReactionPack.Settings.Isolation_4 = loadedData.Isolation_4 or false
 
         for _, setName in ipairs(ReactionPack.IdToSetName) do
             ReactionPack.Settings[setName].CostumeSet = loadedData[setName].CostumeSet or ReactionPack.Settings[setName].CostumeSet
