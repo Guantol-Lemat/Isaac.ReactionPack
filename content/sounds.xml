@@ -12,4 +12,40 @@
 		<sample weight="1" path="reaction/ugh/tank_ugh1.wav" />
 		<sample weight="1" path="reaction/ugh/tank_ugh2.wav" />
 	</sound>
+	
+	<!-- MATTMAN SCREAM -->
+	<sound name="MattScream1">
+		<sample weight="1" path="reaction/mattman_screams/lazy1.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy2.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy3.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy4.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy5.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy6.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy7.wav" />
+	</sound>
+	
+	<sound name="MattScream2">
+		<sample weight="1" path="reaction/mattman_screams/lazy8.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy9.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy10.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy11.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy12.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy13.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy14.wav" />
+	</sound>
+	
+	<sound name="MattScream3">
+		<sample weight="1" path="reaction/mattman_screams/lazy15.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy16.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy17.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy18.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy19.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy20.wav" />
+		<sample weight="1" path="reaction/mattman_screams/lazy21.wav" />
+	</sound>
+	
+	<sound name="MattTCain">
+		<sample weight="1" path="reaction/mattman_screams/pain1.wav" />
+		<sample weight="1" path="reaction/mattman_screams/pain2.wav" />
+	</sound>
 </sounds>

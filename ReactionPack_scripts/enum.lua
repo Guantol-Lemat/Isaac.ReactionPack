@@ -7,6 +7,15 @@ ReactionPack.Sets = {
     Dance = 5
 }
 
+ReactionPack.SetNames = {
+    [ReactionPack.Sets.Disabled] = "Disabled",
+    [ReactionPack.Sets.Trauma] = "Trauma",
+    [ReactionPack.Sets.Ugh] = "Ugh",
+    [ReactionPack.Sets.Neutral] = "Neutral",
+    [ReactionPack.Sets.Pog] = "Pog",
+    [ReactionPack.Sets.Dance] = "Dance"
+}
+
 ReactionPack.Reactions = {
     [ReactionAPI.QualityStatus.GLITCHED] = "Reaction_Glitched",
     [ReactionAPI.QualityStatus.QUALITY_0] = "Reaction_0",

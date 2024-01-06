@@ -28,6 +28,10 @@ local music = {
     [PlayerType.PLAYER_CAIN_B] = {"happyburningmemory"}
 }
 
+local soundDefault = {'TASMScream'}
+
 ReactionPack.AddTraumaCostumePack(costumes, "Traumatized", costumeDefault)
 
 ReactionPack.AddTraumaMusicPack(music, "Traumatized", musicDefault)
+
+ReactionPack.AddTraumaSoundPack({}, "TASM Scream", soundDefault)
