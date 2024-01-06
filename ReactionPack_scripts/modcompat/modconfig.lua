@@ -164,7 +164,7 @@ function InitModConfigMenu()
             OnChange = function(currentSetting)
                 ReactionPack.Settings.WhineThreshold = currentSetting
             end,
-            Info = {"When Isaac Picks Up an Item of a Certain Quality, he will not react (whine) to items of a lower Quality, unless it's above or equal to the Threshold."}
+            Info = {"When Isaac Picks Up an Item of a Certain Quality, he will not react (whine) to items of a lower Quality, unless it's above or equal to the Threshold"}
         })
 
         --General: Reaction Choice
@@ -543,6 +543,20 @@ function InitModConfigMenu()
     end
 end
 
+local function InitRandomizeMenu()
+    local categoryName = "Reaction Randomize"
+
+    for type, typeKey in pairs(ReactionPack.SetTypes) do
+        ModConfigMenu.AddText(categoryName, "Test", function() return "[" .. type .. "]" end)
+        for setID, setName in ipairs(ReactionPack.SetNames) do
+            for _, packName in ipairs(ReactionPack[typeKey][setID].IDs) do
+                ModConfigMenu.AddText(categoryName, "Test", function() return packName .. "[" .. setName .. "]" end)
+            end
+        end
+    end
+end
+
 module.InitModConfigMenu = InitModConfigMenu
+module.InitRandomizeMenu = InitRandomizeMenu
 
 return module

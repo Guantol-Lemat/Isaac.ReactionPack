@@ -1,5 +1,10 @@
 <costumes anm2root="gfx/characters/">
 
+	<!-- LEGACY -->
+	
+	<costume anm2path="isaacugh.anm2" priority="901" type="none" hasSkinAlt="true"/>
+	<costume anm2path="isaacpog.anm2" priority="903" type="none" hasSkinAlt="true"/>
+
 	<!-- TRAUMATIZED -->
 
 	<costume anm2path="traumatized/isaactrauma.anm2" priority="900" type="none" hasSkinAlt="true"/>
@@ -53,6 +58,20 @@
 	<costume anm2path="pog/jacobpogb.anm2" priority="903" type="none"/>
 	<costume anm2path="pog/jacob2pogb.anm2" priority="903" type="none"/>
 	<costume anm2path="pog/samsonpogb.anm2" priority="903" type="none"/>
+	
+	<!-- LET'S GO -->
+	
+	<costume anm2path="let's go/isaacpog.anm2" priority="903" type="none" hasSkinAlt="true"/>
+	<costume anm2path="let's go/azazelpog.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/azazelpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/keeperpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/bluebabypogb.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/painpog.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/lilithpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/lazarus2pogb.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/jacobpogb.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/jacob2pogb.anm2" priority="903" type="none"/>
+	<costume anm2path="let's go/samsonpogb.anm2" priority="903" type="none"/>
 	
 	<!-- SPECIALIST -->
 	

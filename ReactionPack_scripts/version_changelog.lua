@@ -5,7 +5,8 @@ local versions = {
     "1.0.1",
     "1.0.2",
     "1.0.3",
-    "1.0.4"
+    "1.0.4",
+    "1.1.0"
 }
 
 local changeLog = {
@@ -26,13 +27,13 @@ local changeLog = {
         "New Setting: Reaction Isolation",
         "New Setting: React in Death Certificate Dimension",
         "New Setting: Whine Prevention",
-        "Added a Template within the files for easier creation of packs"
+        "Added a Template within the files to simplify creation of packs"
     },
     ["1.1.0"] = {
-        "New POG Costume Pack",
-        "New Trauma Sound Pack",
-        "New Dance Sound Pack",
-        "Use the Settings to enable them"
+        "Made the Mod Compatible with Legacy Pog and Ugh Mods",
+        "New POG Costume Pack [Let's ####### Go!!!]",
+        "New Trauma Sound Pack [TASM Scream]",
+        "New Dance Sound Pack [Lazy Mattman Screams]",
     }
 }
 

@@ -4,7 +4,7 @@ local removeInitMenuAndPatches = false
 
 local log = require("reactionpack_scripts.functions.log")
 
-ReactionPack.ModVersion = "1.0.3"
+ReactionPack.ModVersion = "1.1.0"
 ReactionPack.Enabled = true --Check this to see if ReactionPack is actually enabled or not
 ReactionPack.Diagnostics = {
     SAVE = false
@@ -16,8 +16,8 @@ if ReactionAPI then
     --VARIABLES--
     -------------
 
-    require("reactionpack_scripts/enum")
-    require("reactionpack_scripts/conversion")
+    require("reactionpack_scripts.enum")
+    require("reactionpack_scripts.conversion")
 
     ReactionPack.gameStarted = false
     local firstStart = true
@@ -257,7 +257,9 @@ if ReactionAPI then
     require("reactionpack_scripts.pack.ugh")
     require("reactionpack_scripts.pack.disappointed")
     require("reactionpack_scripts.pack.pog")
+    require("reactionpack_scripts.pack.let's_go")
     require("reactionpack_scripts.pack.specialist")
+    require("reactionpack_scripts.pack.mattman_screams")
 
     ------------
     --SETTINGS--
@@ -679,6 +681,7 @@ if ReactionAPI then
             return
         end
         ModMenu.InitModConfigMenu()
+--        ModMenu.InitRandomizeMenu()
         Epiphany.PatchEpiphany()
         removeInitMenuAndPatches = true
 --        ReactionPack:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, InitMenuAndPatches)
