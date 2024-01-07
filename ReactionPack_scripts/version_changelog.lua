@@ -1,3 +1,4 @@
+local errorMessage = {"Warning for Reaction Port Pack:", "Save File has been Locked",  "Changes made to settings during this session will be discarded"}
 local news = "Reaction Port Pack News:"
 
 local versions = {
@@ -6,7 +7,8 @@ local versions = {
     "1.0.2",
     "1.0.3",
     "1.0.4",
-    "1.1.0"
+    "1.1.0",
+    "1.1.1"
 }
 
 local changeLog = {
@@ -34,10 +36,14 @@ local changeLog = {
         "New POG Costume Pack [Let's ####### Go!!!]",
         "New Trauma Sound Pack [TASM Scream]",
         "New Dance Sound Pack [Lazy Mattman Screams]",
+    },
+    ["1.1.1"] = {
+        "Implemented a Save Lock to prevent a sudden Reset of the Settings",
     }
 }
 
 local removedDeleteMessages = false
+local removedOnFirstRender = false
 
 local renderAtBottom = false
 local addMessages = false
@@ -117,7 +123,34 @@ local function RenderMessages()
     end
 end
 
+local function RenderStartupError()
+    if counter < counterMax and not ReactionPack.gameStarted then
+        local ss = getScreenSize()
+        local ScreenCenter = (ss.X / 2)
+        local alphaValue = (counterMax - counter) / counterMax
+        red.Alpha = alphaValue
+        yellow.Alpha = alphaValue
+
+        for i, message in ipairs(errorMessage) do
+            local color = i == 1 and yellow or red
+            local x = (ScreenCenter) - (font:GetStringWidthUTF8(message) / 2)
+            local y = yOffset + (font:GetLineHeight() * (i - 1))
+            font:DrawStringUTF8(message, x, y, color, 0, true)
+        end
+
+        if not game:IsPaused() then
+            counter = counter + 1
+        end
+    end
+end
+
 local function OnFirstRender()
+    if removedOnFirstRender then
+        return
+    end
+    if not ReactionPack.gameStarted then
+        return
+    end
     if ReactionPack.SavedSettings.ModVersion ~= ReactionPack.ModVersion then
         GetNewMessages()
         if #messageList > 0 then
@@ -126,15 +159,20 @@ local function OnFirstRender()
             table.insert(messageList, 1, news)
         end
     end
-    ReactionPack:RemoveCallback(ModCallbacks.MC_POST_RENDER, OnFirstRender)
+    removedOnFirstRender = true
+--    ReactionPack:RemoveCallback(ModCallbacks.MC_POST_RENDER, OnFirstRender)
 end
 
 local function DeleteMessages()
+    counter = 0
     if removedDeleteMessages then
         return
     end
-    counter = nil
+    if not removedOnFirstRender then
+        return
+    end
     messageList = nil
+    ReactionPack:RemoveCallback(ModCallbacks.MC_POST_RENDER, OnFirstRender)
     ReactionPack:RemoveCallback(ModCallbacks.MC_POST_RENDER, RenderMessages)
     removedDeleteMessages = true
 --    ReactionPack:RemoveCallback(ModCallbacks.MC_PRE_GAME_EXIT, DeleteMessages)
@@ -142,3 +180,4 @@ end
 
 ReactionPack:AddCallback(ModCallbacks.MC_POST_RENDER, OnFirstRender)
 ReactionPack:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, DeleteMessages)
+ReactionPack:AddCallback(ModCallbacks.MC_POST_RENDER, RenderStartupError)

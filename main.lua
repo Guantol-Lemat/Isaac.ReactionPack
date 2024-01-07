@@ -4,7 +4,7 @@ local removeInitMenuAndPatches = false
 
 local log = require("reactionpack_scripts.functions.log")
 
-ReactionPack.ModVersion = "1.1.0"
+ReactionPack.ModVersion = "1.1.1"
 ReactionPack.Enabled = true --Check this to see if ReactionPack is actually enabled or not
 ReactionPack.Diagnostics = {
     SAVE = false
