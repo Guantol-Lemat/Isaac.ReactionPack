@@ -1,3 +1,5 @@
+ReactionPack.ConfigVersion = "1.0.0"
+
 local json = require("json")
 local utility = require("reactionpack_scripts.functions.utility")
 local deepcopy = utility.DeepCopy
@@ -87,9 +89,14 @@ ReactionPack:AddPriorityCallback(ModCallbacks.MC_POST_GAME_STARTED, CallbackPrio
 --------
 
 local function SaveSettings()
+    if not ReactionPack.gameStarted then
+        log.print("[WARNING for ReactionPack]: The Mod did not start up properly. Changes made to settings during this session have been Discarded")
+        return
+    end
     log.diagnostic("SAVE", "Attempting Save (no data will actually be saved)")
     ReactionPack.SavedSettings = deepcopy(ReactionPack.Settings)
     ReactionPack.SavedSettings.ModVersion = ReactionPack.ModVersion
+    ReactionPack.SavedSettings.ConfigVersion = ReactionPack.ConfigVersion
 
     for _, setName in ipairs(ReactionPack.IdToSetName) do
         local setRoot = ReactionPack.SavedSettings[setName]
