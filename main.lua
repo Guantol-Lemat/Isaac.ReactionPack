@@ -690,7 +690,7 @@ if ReactionAPI then
     local function OnCollectiblePickup(_, EntityPlayer)
         if EntityPlayer.QueuedItem.Item then
             if EntityPlayer.QueuedItem.Item:IsCollectible() then
-                bestQualityInRoom = math.max(bestQualityInRoom, ReactionAPI.CollectibleData[EntityPlayer.QueuedItem.Item.ID])
+                bestQualityInRoom = math.max(bestQualityInRoom, ReactionAPI.CollectibleQuality[EntityPlayer.QueuedItem.Item.ID])
             end
         end
     end
