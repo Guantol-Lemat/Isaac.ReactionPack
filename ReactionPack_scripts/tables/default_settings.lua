@@ -41,6 +41,9 @@ ReactionPack.DefaultSettings.Isolation_2 = false
 ReactionPack.DefaultSettings.Isolation_3 = false
 ReactionPack.DefaultSettings.Isolation_4 = false
 
+ReactionPack.DefaultSettings.ReactToCrane = true
+ReactionPack.DefaultSettings.ReactToFlip = true
+
 ReactionPack.DefaultSettings.Trauma = {CostumeSet = ReactionPack.Sets.Trauma, CostumePack = defaultPack, MusicSet = ReactionPack.Sets.Trauma, MusicPack = defaultPack, SoundSet = ReactionPack.Sets.Disabled, SoundPack = defaultPack}
 ReactionPack.DefaultSettings.Ugh = {CostumeSet = ReactionPack.Sets.Ugh, CostumePack = defaultPack, MusicSet = ReactionPack.Sets.Disabled, MusicPack = defaultPack, SoundSet = ReactionPack.Sets.Ugh, SoundPack = defaultPack}
 ReactionPack.DefaultSettings.Neutral = {CostumeSet = ReactionPack.Sets.Neutral, CostumePack = defaultPack, MusicSet = ReactionPack.Sets.Disabled, MusicPack = defaultPack, SoundSet = ReactionPack.Sets.Disabled, SoundPack = defaultPack}

@@ -43,8 +43,8 @@ if ReactionAPI then
     end
 
     local blindBypassToVisibility = {
-        [false] = ReactionAPI.Context.Visibility.VISIBLE,
-        [true] = ReactionAPI.Context.Visibility.ABSOLUTE
+        [false] = ReactionAPI.Visibility.VISIBLE,
+        [true] = ReactionAPI.Visibility.ABSOLUTE
     }
 
     local QualityStatusToIsolation = {
@@ -268,8 +268,6 @@ if ReactionAPI then
     function ReactionPack:DoNothing()
     end
 
-    require("reactionpack_scripts.tables.settings")
-
     ---------------------
     --BASE APPLY/REMOVE--
     ---------------------
@@ -353,86 +351,9 @@ if ReactionAPI then
             musicName = musicList[randomMusic]
             musicID = Isaac.GetMusicIdByName(musicName)
         end
-        if MusicManager():GetCurrentMusicID() ~= musicID then
-            MusicManager():Play(musicID, 1);
-        end
-        MusicManager():UpdateVolume()
+        MusicManager():Crossfade(musicID)
+        MusicManager():UpdateVolume() -- Shouldn't be necessary with Crossfade but given that otherwise it would lead to an Earrape I'd rather not risk it.
         ReactionMusicIsPlaying = true
-    end
-
-    local function GetSoundtrackMenuSong(OriginalMusic)
-        local defaultSong= finddefaultsongindexbyID(OriginalMusic)
-        return findsongbydefaultIndex(defaultSong, false, false)
-    end
-
-    local function ChallengeRemoveMusic()
-        local challengeMusic = Music.MUSIC_CHALLENGE_FIGHT
-        if MMC and MMC.Initialised and SoundtrackSongList then
-            challengeMusic = GetSoundtrackMenuSong(challengeMusic)
-        end
-        if MusicManager():GetCurrentMusicID() ~= challengeMusic then
-            MusicManager():Play(challengeMusic, 1);
-            MusicManager():UpdateVolume()
-        end
-        ReactionMusicIsPlaying = false
-    end
-
-    local function BossRushRemoveMusic()
-        local bossRushMusic = Music.MUSIC_BOSS_RUSH
-        if MMC and MMC.Initialised and SoundtrackSongList then
-            bossRushMusic = GetSoundtrackMenuSong(bossRushMusic)
-        end
-        if MusicManager():GetCurrentMusicID() ~= bossRushMusic then
-            MusicManager():Play(bossRushMusic, 1);
-            MusicManager():UpdateVolume()
-        end
-        ReactionMusicIsPlaying = false
-    end
-
-    local function ClearedRoomRemoveMusic()
-        local clearedMusic = Music.MUSIC_BOSS_OVER
-        if MMC and MMC.Initialised and SoundtrackSongList then
-            clearedMusic = GetSoundtrackMenuSong(clearedMusic)
-        end
-        if MusicManager():GetCurrentMusicID() ~= clearedMusic then
-            MusicManager():Play(clearedMusic, 1);
-            MusicManager():UpdateVolume()
-        end
-        ReactionMusicIsPlaying = false
-    end
-
-    local function MirrorRemoveMusic()
-        local stageType = Game():GetLevel():GetStageType()
-        local mirrorMusic
-        if stageType == StageType.STAGETYPE_REPENTANCE_B then
-            mirrorMusic = Music.MUSIC_DROSS_REVERSE
-        else
-            mirrorMusic = Music.MUSIC_DOWNPOUR_REVERSE
-        end
-        if MMC and MMC.Initialised and SoundtrackSongList then
-            mirrorMusic = GetSoundtrackMenuSong(mirrorMusic)
-        end
-        if MusicManager():GetCurrentMusicID() ~= mirrorMusic then
-            MusicManager():Play(mirrorMusic, 1);
-            MusicManager():UpdateVolume()
-        end
-        ReactionMusicIsPlaying = false
-    end
-
-    local function DefaultRemoveMusic()
-        if MMC and MMC.Initialised then
-            local stageTrack = MMC.GetStageTrack()
-            if SoundtrackSongList then
-                stageTrack = GetSoundtrackMenuSong(stageTrack)
-            end
-            if MusicManager():GetCurrentMusicID() ~= stageTrack then
-                MusicManager():Play(stageTrack, 1);
-                MusicManager():UpdateVolume()
-            end
-        else
-            Game():GetRoom():PlayMusic()
-        end
-        ReactionMusicIsPlaying = false
     end
 
     local function RemoveMusic()
@@ -444,34 +365,25 @@ if ReactionAPI then
             ReactionMusicIsPlaying = false
             return
         end
-        local room = Game():GetRoom()
-        local roomType = room:GetType()
-
-        if not Game():GetLevel():IsAscent() then
-            if room:IsAmbushActive() then
-                if roomType == RoomType.ROOM_CHALLENGE then
-                    ChallengeRemoveMusic()
-                    return
-                end
-                if roomType == RoomType.ROOM_BOSSRUSH then
-                    BossRushRemoveMusic()
-                    return
-                end
-            end
-            if room:IsAmbushDone() then
-                ClearedRoomRemoveMusic()
-                return
-            end
-            if (room:GetType() == RoomType.ROOM_BOSS or room:GetType() == RoomType.ROOM_MINIBOSS) and room:IsClear() then
-                ClearedRoomRemoveMusic()
-                return
-            end
-            if room:IsMirrorWorld() then
-                MirrorRemoveMusic()
-                return
+        local currentRoomMusic = Music.MUSIC_NULL
+        if SoundtrackSongList then
+            currentRoomMusic = ReactionAPI.Utilities.GetSoundtrackMenuMusic()
+        else
+            currentRoomMusic = ReactionAPI.Utilities.GetCurrentRoomMusic(true)
+        end
+        if currentRoomMusic.SpecialScenario == ReactionAPI.Music.Scenario.NO_UNTRACKED_CASES then
+            Game():GetRoom():PlayMusic()
+            ReactionMusicIsPlaying = false
+            return
+        end
+        MusicManager():Crossfade(currentRoomMusic.CurrentTrack)
+        MusicManager():UpdateVolume() -- Shouldn't be necessary with Crossfade but given that otherwise it would lead to an Earrape I'd rather not risk it.
+        if currentRoomMusic.Queue then
+            for _, musicID in ipairs(currentRoomMusic.Queue) do
+                MusicManager():Queue(musicID)
             end
         end
-        DefaultRemoveMusic()
+        ReactionMusicIsPlaying = false
     end
 
     local function PlaySound(soundSet, soundPack)
@@ -571,8 +483,16 @@ if ReactionAPI then
 
     local function UpdateCostumeAndMusic()
         local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
-        local filter = ReactionAPI.Context.Filter.ALL
+        local filter = ReactionAPI.Filter.ALL
         local collectibleQuality = ReactionAPI.Interface.cGetBestQuality(visibility)
+
+        if ReactionPack.Settings.ReactToCrane then
+            collectibleQuality = math.max(collectibleQuality, ReactionAPI.Interface.slotGetBestQuality(ReactionAPI.SlotType.CRANE_GAME))
+        end
+
+        if ReactionPack.Settings.ReactToFlip and ReactionAPI.Utilities.AnyPlayerHasCollectible(CollectibleType.COLLECTIBLE_FLIP) then
+            collectibleQuality = math.max(collectibleQuality, ReactionAPI.Interface.flipGetBestQuality(filter))
+        end
 
         threshold = math.min(bestQualityInRoom, ReactionPack.Settings.WhineThreshold)
 
@@ -614,8 +534,16 @@ if ReactionAPI then
 
     local function UpdateSound()
         local visibility = blindBypassToVisibility[ReactionPack.Settings.BlindBypass]
-        local filter = ReactionAPI.Context.Filter.NEW
+        local filter = ReactionAPI.Filter.NEW
         local newCollectibleQualityStatus = ReactionAPI.Interface.cGetQualityStatus(visibility, filter)
+
+        if ReactionPack.Settings.ReactToCrane then
+            newCollectibleQualityStatus = newCollectibleQualityStatus | ReactionAPI.Interface.slotGetQualityStatus(ReactionAPI.SlotType.CRANE_GAME, filter)
+        end
+
+        if ReactionPack.Settings.ReactToFlip and ReactionAPI.Utilities.AnyPlayerHasCollectible(CollectibleType.COLLECTIBLE_FLIP) then
+            newCollectibleQualityStatus = newCollectibleQualityStatus | ReactionAPI.Interface.flipGetQualityStatus(filter)
+        end
 
         local isCustomSoundNotPlaying = not (SFXManager():IsPlaying(PlayedCustomSound))
         local newCollectibleQuality = newCollectibleQualityStatus == 0 and ReactionAPI.QualityStatus.NO_ITEMS or math.floor(math.log(newCollectibleQualityStatus, 2)) - 1
